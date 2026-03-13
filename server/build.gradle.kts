@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+    developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("com.mysql:mysql-connector-j")
 }
 
@@ -18,6 +19,6 @@ tasks.test {
     useJUnitPlatform()
 }
 
-//tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-//    enabled = true
-//}
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+    enabled = true
+}
