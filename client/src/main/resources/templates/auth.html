@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>DunkelWeiss</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}"/>
+</head>
+<body>
+
+<!-- ── Cabecera con botón de alternancia ──
+     El botón cambia entre "Sign In" y "Sign Up" mostrando/ocultando
+     el formulario correspondiente sin recargar la página. -->
+<header>
+    <button class="toggle-btn" id="toggle-btn" onclick="toggleMode()">
+        <!-- El texto del botón se actualiza al cambiar de modo -->
+        Sign Up
+    </button>
+</header>
+
+<main>
+    <div class="card">
+
+        <!-- ── Formulario de Sign In ── -->
+        <div id="signin-section">
+            <h1>Sign In</h1>
+
+            <!-- Mensaje de error: solo visible si Thymeleaf recibe error=true -->
+            <div class="error-msg" th:if="${error}">
+                Usuario o contraseña incorrectos.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="signin-username">Usuario</label>
+                    <input type="text" id="signin-username" name="username"
+                           placeholder="Tu nombre de usuario" required/>
+                </div>
+                <div class="form-group">
+                    <label for="signin-password">Contraseña</label>
+                    <input type="password" id="signin-password" name="password"
+                           placeholder="Tu contraseña" required/>
+                </div>
+                <button type="submit" class="submit-btn">Iniciar sesión</button>
+            </form>
+        </div>
+
+        <!-- ── Formulario de Sign Up ── -->
+        <div id="signup-section" style="display:none;">
+            <h1>Sign Up</h1>
+
+            <!-- Mensaje de error: solo visible si Thymeleaf recibe error=true en modo signup -->
+            <div class="error-msg" th:if="${error}">
+                El nombre de usuario ya existe. Prueba con otro.
+            </div>
+
+            <form th:action="@{/register}" method="post">
+                <div class="form-group">
+                    <label for="signup-username">Usuario</label>
+                    <input type="text" id="signup-username" name="username"
+                           placeholder="Elige un nombre de usuario" required/>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Contraseña</label>
+                    <input type="password" id="signup-password" name="password"
+                           placeholder="Elige una contraseña" required/>
+                </div>
+                <button type="submit" class="submit-btn">Crear cuenta</button>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    /**
+     * Inicialización: si el servidor devolvió mode=signup en la URL
+     * (ej. tras un error de registro), arrancamos en modo signup.
+     */
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialMode = urlParams.get('mode') || 'signin';
+    if (initialMode === 'signup') {
+        showSignup();
+    }
+
+    /**
+     * Alterna entre los formularios de Sign In y Sign Up.
+     * Muestra el formulario correspondiente y actualiza el texto del botón.
+     */
+    function toggleMode() {
+        const signinSection = document.getElementById('signin-section');
+        const signupSection = document.getElementById('signup-section');
+        const btn = document.getElementById('toggle-btn');
+
+        // Comprueba qué sección está activa y cambia a la contraria
+        if (signinSection.style.display !== 'none') {
+            showSignup();
+        } else {
+            showSignin();
+        }
+    }
+
+    /** Muestra el formulario de Sign In y oculta el de Sign Up. */
+    function showSignin() {
+        document.getElementById('signin-section').style.display = 'block';
+        document.getElementById('signup-section').style.display = 'none';
+        document.getElementById('toggle-btn').textContent = 'Sign Up';
+    }
+
+    /** Muestra el formulario de Sign Up y oculta el de Sign In. */
+    function showSignup() {
+        document.getElementById('signin-section').style.display = 'none';
+        document.getElementById('signup-section').style.display = 'block';
+        document.getElementById('toggle-btn').textContent = 'Sign In';
+    }
+</script>
+
+</body>
+</html>
