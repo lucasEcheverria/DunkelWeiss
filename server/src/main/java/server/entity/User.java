@@ -28,4 +28,7 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Post> posts;
+
+    public String getNickname(){return this.nickname;
+    }
 }
