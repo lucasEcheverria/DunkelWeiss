@@ -23,4 +23,7 @@ public class Comunidad {
 
     @OneToMany(mappedBy = "comunidad", cascade = CascadeType.ALL)
     private List<Hilo> threads;
+
+
+    public String getNombre() { return this.nombre;}
 }
