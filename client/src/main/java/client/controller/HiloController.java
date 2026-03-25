@@ -1,6 +1,6 @@
 package client.controller;
 
-import client.service.HiloService;
+import client.service.HiloServiceProxy;
 import lib.dto.HiloDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,9 +18,9 @@ import java.util.List;
 @Controller
 public class HiloController {
 
-    private final HiloService hiloService;
+    private final HiloServiceProxy hiloService;
 
-    public HiloController(HiloService hiloService) {
+    public HiloController(HiloServiceProxy hiloService) {
         this.hiloService = hiloService;
     }
 

@@ -16,12 +16,12 @@ import java.util.List;
  * para operaciones relacionadas con hilos.
  */
 @Service
-public class HiloService {
+public class HiloServiceProxy {
 
     private final RestTemplate restTemplate;
     private final String serverApiUrl;
 
-    public HiloService(RestTemplate restTemplate, AppConfig appConfig) {
+    public HiloServiceProxy(RestTemplate restTemplate, AppConfig appConfig) {
         this.restTemplate = restTemplate;
         this.serverApiUrl = appConfig.getServerApiUrl();
     }

@@ -14,12 +14,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-public class ThreadService {
+public class ThreadServiceProxy {
 
     private final RestTemplate restTemplate;
     private final String       serverApiUrl;
 
-    public ThreadService(RestTemplate restTemplate, AppConfig appConfig) {
+    public ThreadServiceProxy(RestTemplate restTemplate, AppConfig appConfig) {
         this.restTemplate = restTemplate;
         this.serverApiUrl = appConfig.getServerApiUrl();
     }

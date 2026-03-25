@@ -1,6 +1,6 @@
 package client.controller;
 
-import client.service.AuthService;
+import client.service.AuthServiceProxy;
 import lib.dto.UserCredentialsDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceProxy authService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthServiceProxy authService) {
         this.authService = authService;
     }
 
@@ -52,15 +52,17 @@ public class AuthController {
      * a AuthService. Si el servidor confirma las credenciales (200 OK),
      * redirige a la página principal. Si falla, vuelve al login con error.
      *
-     * @param username nombre de usuario introducido en el formulario
+     * @param email    correo electrónico del usuario
      * @param password contraseña introducida en el formulario
      * @return redirección a /home si OK, o a /?error=true si falla
      */
     @PostMapping("/login")
     public String login(
-            @RequestParam("username") String username,
+            @RequestParam("email") String email,
             @RequestParam("password") String password) {
-        UserCredentialsDto credentials = new UserCredentialsDto(username, password);
+        UserCredentialsDto credentials = new UserCredentialsDto();
+        credentials.setEmail(email);
+        credentials.setPassword(password);
         boolean success = authService.login(credentials);
         if (success) {
             return "redirect:/home";
@@ -76,15 +78,18 @@ public class AuthController {
      * al login para que el usuario inicie sesión. Si falla (usuario ya existe
      * u otro error), vuelve al formulario de registro con error.
      *
+     * @param email    correo electrónico del usuario
      * @param username nombre de usuario deseado
      * @param password contraseña deseada
      * @return redirección a / (sign in) si OK, o a /?mode=signup&error=true si falla
      */
     @PostMapping("/register")
     public String register(
+            @RequestParam("email") String email,
             @RequestParam("username") String username,
             @RequestParam("password") String password) {
-        UserCredentialsDto credentials = new UserCredentialsDto(username, password);
+        // Construct DTO and set email so the proxy sends it to the server
+        UserCredentialsDto credentials = new UserCredentialsDto(email, username, password);
         boolean success = authService.register(credentials);
         if (success) {
             return "redirect:/";
