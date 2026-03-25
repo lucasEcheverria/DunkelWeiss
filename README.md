@@ -1,11 +1,39 @@
-# DunkelWeiss README
-## Variables de entorno Base de Datos
-Cada uno debe generar un archivo .env para las contraseñas de la base de datos:
+# DunkelWeiss
 
+## 📦 Dependencias
+
+Antes de comenzar, asegúrate de tener instalado:
+
+- 🐳 Docker: https://www.docker.com/get-started/
+
+---
+
+## 🚀 Instalación y ejecución
+
+Sigue estos pasos para levantar el proyecto en tu entorno local:
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/lucasEcheverria/DunkelWeiss.git
 ```
-# /root/server/.env
-DB_ROOT_PASSWORD=pon_tu_contraseña_aqui
-DB_USER=usuario_local
-DB_PASSWORD=pass_local
-DB_NAME=dunkelweiss_db
+
+### 2. Ir al directorio del proyecto:
+```bash
+cd DunkelWeiss
+```
+
+### 3. Ejecutar el proyecto:
+<b>🪟 Windows PowerShell</b>
+```
+gradlew.bat bootRun --parallel
+```
+<b>🐧 Linux Bash</b>
+```
+./gradlew bootRun --parallel
+```
+
+### 4. 🌐 Acceso a la aplicación
+Una vez ejecutado el proyecto, puedes acceder al cliente en:
+```bash
+http://localhost:8081
 ```
