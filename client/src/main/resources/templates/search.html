@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Buscar hilos</title>
+</head>
+<body>
+
+<h1>Buscar hilos</h1>
+
+<form action="/search" method="get">
+    <input type="text"
+           name="q"
+           th:value="${query}"
+           placeholder="Buscar hilos..."/>
+    <button type="submit">Buscar</button>
+</form>
+
+<div th:if="${#lists.isEmpty(hilos)}">
+    <p>No se encontraron hilos.</p>
+</div>
+
+<div th:each="hilo : ${hilos}">
+    <h3 th:text="${hilo.title}"></h3>
+    <p th:text="${hilo.description}"></p>
+</div>
+
+</body>
+</html>

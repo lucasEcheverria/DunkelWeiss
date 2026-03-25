@@ -40,3 +40,5 @@ public class Hilo {
     public void setOwner(User owner)               { this.owner = owner; }
     public void setComunidad(Comunidad comunidad)  { this.comunidad = comunidad; }
 }
+
+
