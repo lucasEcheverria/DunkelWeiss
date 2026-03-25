@@ -1,5 +1,6 @@
 package server.controller;
 
+import java.util.Map;
 import java.util.Optional;
 
 import lib.dto.UserDto;
@@ -61,22 +62,33 @@ public class UserController {
         }
     )
     @PutMapping("/me/update")
-    public ResponseEntity<Void> updateCurrentUser(
-            @RequestBody String token, UpdateUserDto dto) {
+    public ResponseEntity<UserDto> updateCurrentUser(
+            @RequestBody Map<String, Object> body) {
 
-        if (dto == null) {
+        if (body == null) {
         	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        if (token == null || token.isBlank()) {
+        Object tokenObj = body.get("token");
+        if (tokenObj == null || !(tokenObj instanceof String) || ((String) tokenObj).isBlank()) {
         	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
+        String token = (String) tokenObj;
+
+        String nickname = null;
+        String password = null;
+        Object nickObj = body.get("nickname");
+        if (nickObj instanceof String) nickname = (String) nickObj;
+        Object passObj = body.get("password");
+        if (passObj instanceof String) password = (String) passObj;
+
+        UpdateUserDto dto = new UpdateUserDto(nickname, password);
 
         Optional<UserDto> updated = userService.updateUserByToken(token, dto);
         if (updated.isPresent()) {
-        	return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(updated.get(), HttpStatus.OK);
         } else {
-        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 }
