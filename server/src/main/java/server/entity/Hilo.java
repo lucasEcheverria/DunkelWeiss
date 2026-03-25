@@ -41,8 +41,4 @@ public class Hilo {
     public void setComunidad(Comunidad comunidad)  { this.comunidad = comunidad; }
 }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-}
 
