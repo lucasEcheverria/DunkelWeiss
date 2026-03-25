@@ -6,7 +6,7 @@ import lib.dto.HiloSummaryDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import client.service.ThreadService;
+import client.service.ThreadServiceProxy;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ import java.util.List;
 @RequestMapping("/threads")
 public class ThreadController {
 
-    private final ThreadService threadService;
+    private final ThreadServiceProxy threadService;
 
-    public ThreadController(ThreadService threadService) {
+    public ThreadController(ThreadServiceProxy threadService) {
         this.threadService = threadService;
     }
 
