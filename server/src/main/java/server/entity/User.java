@@ -19,14 +19,22 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-            name = "user_comunidades",
+            name = "user_communities",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "comunidad_id")
+            inverseJoinColumns = @JoinColumn(name = "community_id")
     )
-    private List<Comunidad> comunidades;
+    private List<Community> communities;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favorite_threads",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "thread_id")
+    )
+    private List<Thread> favoriteThreads;
 
     @OneToMany(mappedBy = "owner")
-    private List<Hilo> threads;
+    private List<Thread> threads;
 
     @OneToMany(mappedBy = "owner")
     private List<Post> posts;
@@ -42,6 +50,8 @@ public class User {
     }
 
     // Getters and setters
+
+
     public Integer getId() {
         return id;
     }
@@ -59,7 +69,7 @@ public class User {
     }
 
     public String getNickname() {
-        return this.nickname;
+        return nickname;
     }
 
     public void setNickname(String nickname) {
@@ -72,6 +82,38 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Community> getcommunities() {
+        return communities;
+    }
+
+    public void setcommunities(List<Community> communities) {
+        this.communities = communities;
+    }
+
+    public List<Thread> getFavoriteThreads() {
+        return favoriteThreads;
+    }
+
+    public void setFavoriteThreads(List<Thread> favoriteThreads) {
+        this.favoriteThreads = favoriteThreads;
+    }
+
+    public List<Thread> getThreads() {
+        return threads;
+    }
+
+    public void setThreads(List<Thread> threads) {
+        this.threads = threads;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 
     public boolean checkPassword(String password) {
