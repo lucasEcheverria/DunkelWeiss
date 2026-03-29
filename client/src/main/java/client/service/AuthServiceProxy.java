@@ -1,7 +1,7 @@
 package client.service;
 
 import client.config.AppConfig;
-import lib.dto.UserCredentialsDto;
+import lib.dto.UserCredentialsDTO;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ public class AuthServiceProxy {
         this.serverApiUrl = appConfig.getServerApiUrl();
     }
 
-    public boolean login(UserCredentialsDto credentials) {
+    public boolean login(UserCredentialsDTO credentials) {
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(
                 serverApiUrl + "/auth/login",
@@ -88,7 +88,7 @@ public class AuthServiceProxy {
         return this.token;
     }
 
-    public boolean register(UserCredentialsDto credentials) {
+    public boolean register(UserCredentialsDTO credentials) {
         try {
             ResponseEntity<Void> response = restTemplate.postForEntity(
                 serverApiUrl + "/auth/register",

@@ -2,7 +2,7 @@ package server.controller;
 
 import java.util.Optional;
 
-import lib.dto.UserCredentialsDto;
+import lib.dto.UserCredentialsDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +37,7 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<String> login(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Correo electrónico y contraseña", required = true)
-            @RequestBody UserCredentialsDto credentialsDTO) {
+            @RequestBody UserCredentialsDTO credentialsDTO) {
 		Optional<String> token = authService.login(credentialsDTO.getEmail(), credentialsDTO.getPassword());
 		
 		if (token.isPresent()) {
@@ -81,7 +81,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Email, username y password", required = true)
-            @RequestBody UserCredentialsDto credentialsDTO) {
+            @RequestBody UserCredentialsDTO credentialsDTO) {
         Optional<?> created = authService.register(credentialsDTO).map(u -> (Object) u);
 
         if (created.isPresent()) {

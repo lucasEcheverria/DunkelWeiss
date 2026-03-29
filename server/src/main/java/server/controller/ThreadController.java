@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lib.dto.CreateHiloDto;
-import lib.dto.HiloDto;
-import lib.dto.HiloSummaryDto;
+import lib.dto.CreateThreadDTO;
+import lib.dto.ThreadDTO;
+import lib.dto.ThreadSummaryDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +40,10 @@ public class ThreadController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "201",
-                    description = "Hilo creado correctamente",
+                    description = "Thread creado correctamente",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = HiloDto.class)
+                            schema = @Schema(implementation = ThreadDTO.class)
                     )
             ),
             @ApiResponse(
@@ -60,7 +60,7 @@ public class ThreadController {
             required = true,
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = CreateHiloDto.class),
+                    schema = @Schema(implementation = CreateThreadDTO.class),
                     examples = @ExampleObject(
                             name = "Ejemplo básico",
                             value = """
@@ -75,9 +75,9 @@ public class ThreadController {
             )
     )
     @PostMapping("/create")
-    public ResponseEntity<?> createHilo(@RequestBody CreateHiloDto dto) {
+    public ResponseEntity<?> createHilo(@RequestBody CreateThreadDTO dto) {
         try {
-            HiloDto created = threadService.createHilo(dto);
+            ThreadDTO created = threadService.createHilo(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -91,10 +91,10 @@ public class ThreadController {
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
-                    description = "Hilo encontrado",
+                    description = "Thread encontrado",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = HiloDto.class)
+                            schema = @Schema(implementation = ThreadDTO.class)
                     )
             ),
             @ApiResponse(
@@ -102,7 +102,7 @@ public class ThreadController {
                     description = "No existe ningún hilo con ese ID",
                     content = @Content(
                             mediaType = MediaType.TEXT_PLAIN_VALUE,
-                            examples = @ExampleObject(value = "Hilo no encontrado: 99")
+                            examples = @ExampleObject(value = "Thread no encontrado: 99")
                     )
             )
     })
@@ -112,7 +112,7 @@ public class ThreadController {
             @PathVariable Integer id
     ) {
         try {
-            HiloDto hilo = threadService.getHilo(id);
+            ThreadDTO hilo = threadService.getHilo(id);
             return ResponseEntity.ok(hilo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -129,11 +129,11 @@ public class ThreadController {
             description = "Lista de hilos (puede estar vacía si no hay ninguno)",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    schema = @Schema(implementation = HiloSummaryDto.class)
+                    schema = @Schema(implementation = ThreadSummaryDTO.class)
             )
     )
     @GetMapping("/getAll")
-    public ResponseEntity<List<HiloSummaryDto>> getAllSummaries() {
+    public ResponseEntity<List<ThreadSummaryDTO>> getAllSummaries() {
         return ResponseEntity.ok(threadService.getAllSummaries());
     }
 }

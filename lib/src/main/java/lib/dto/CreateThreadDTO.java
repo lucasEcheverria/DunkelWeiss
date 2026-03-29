@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public class CreateHiloDto {
+public class CreateThreadDTO {
 
     @NotBlank
     @JsonProperty("title")
@@ -21,10 +21,10 @@ public class CreateHiloDto {
     @JsonProperty("ownerId")
     private Integer ownerId;
 
-    public CreateHiloDto() {}
+    public CreateThreadDTO() {}
 
-    public CreateHiloDto(String title, String description,
-                         Integer comunidadId, Integer ownerId) {
+    public CreateThreadDTO(String title, String description,
+                           Integer comunidadId, Integer ownerId) {
         this.title       = title;
         this.description = description;
         this.comunidadId = comunidadId;
@@ -43,7 +43,7 @@ public class CreateHiloDto {
 
     @Override
     public String toString() {
-        return "CreateHiloDto{" +
+        return "CreateThreadDTO{" +
                 "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", comunidadId=" + comunidadId +

@@ -1,7 +1,7 @@
 package client.controller;
 
 import client.service.HiloServiceProxy;
-import lib.dto.HiloDto;
+import lib.dto.ThreadDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +36,7 @@ public class HiloController {
     public String buscarHilos(
             @RequestParam(value = "q", required = false, defaultValue = "") String query,
             Model model) {
-        List<HiloDto> hilos = hiloService.buscarHilos(query);
+        List<ThreadDTO> hilos = hiloService.buscarHilos(query);
         model.addAttribute("hilos", hilos);
         model.addAttribute("query", query);
         return "search";

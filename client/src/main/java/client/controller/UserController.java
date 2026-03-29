@@ -2,8 +2,8 @@ package client.controller;
 
 import client.service.AuthServiceProxy;
 import client.service.UserServiceProxy;
-import lib.dto.UpdateUserDto;
-import lib.dto.UserDto;
+import lib.dto.UpdateUserDTO;
+import lib.dto.UserDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ public class UserController {
             return "redirect:/"; // No se ha identificado, redirige al login
         }
 
-        UserDto user = userService.getCurrentUser(token);
+        UserDTO user = userService.getCurrentUser(token);
         if (user == null) {
             return "redirect:/?error=true";
         }
@@ -49,9 +49,9 @@ public class UserController {
             return "redirect:/";
         }
 
-        UpdateUserDto dto = new UpdateUserDto(nickname, password);
+        UpdateUserDTO dto = new UpdateUserDTO(nickname, password);
 
-        UserDto updated = userService.updateUser(dto);
+        UserDTO updated = userService.updateUser(dto);
         if (updated == null) {
             return "redirect:/profile?error=true";
         }

@@ -1,14 +1,14 @@
 package server.service;
 
-import lib.dto.CreateHiloDto;
-import lib.dto.HiloDto;
-import lib.dto.HiloSummaryDto;
+import lib.dto.CreateThreadDTO;
+import lib.dto.ThreadDTO;
+import lib.dto.ThreadSummaryDTO;
 import org.springframework.stereotype.Service;
-import server.dao.ComunidadRepository;
-import server.dao.HiloRepository;
+import server.dao.CommunityRepository;
+import server.dao.ThreadRepository;
 import server.dao.UserRepository;
-import server.entity.Comunidad;
-import server.entity.Hilo;
+import server.entity.Community;
+import server.entity.Thread;
 import server.entity.User;
 
 import java.util.List;
@@ -16,58 +16,58 @@ import java.util.List;
 @Service
 public class ThreadService {
 
-    private final HiloRepository     hiloRepository;
+    private final ThreadRepository threadRepository;
     private final UserRepository     userRepository;
-    private final ComunidadRepository comunidadRepository;
+    private final CommunityRepository communityRepository;
 
-    public ThreadService(HiloRepository hiloRepository,
+    public ThreadService(ThreadRepository threadRepository,
                          UserRepository userRepository,
-                         ComunidadRepository comunidadRepository) {
-        this.hiloRepository      = hiloRepository;
+                         CommunityRepository communityRepository) {
+        this.threadRepository = threadRepository;
         this.userRepository      = userRepository;
-        this.comunidadRepository = comunidadRepository;
+        this.communityRepository = communityRepository;
     }
 
-    public HiloDto createHilo(CreateHiloDto dto) {
+    public ThreadDTO createHilo(CreateThreadDTO dto) {
         User owner = userRepository.findById(dto.getOwnerId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Usuario no encontrado: " + dto.getOwnerId()));
 
-        Comunidad comunidad = comunidadRepository.findById(dto.getComunidadId())
+        Community community = communityRepository.findById(dto.getComunidadId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Comunidad no encontrada: " + dto.getComunidadId()));
+                        "Community no encontrada: " + dto.getComunidadId()));
 
-        Hilo hilo = new Hilo();
+        Thread hilo = new Thread();
         hilo.setTitle(dto.getTitle());
         hilo.setDescription(dto.getDescription());
         hilo.setOwner(owner);
-        hilo.setComunidad(comunidad);
+        hilo.setCommunity(community);
 
-        Hilo saved = hiloRepository.save(hilo);
+        Thread saved = threadRepository.save(hilo);
         return toDto(saved);
     }
 
-    public HiloDto getHilo(Integer id) {
-        Hilo hilo = hiloRepository.findById(id)
+    public ThreadDTO getHilo(Integer id) {
+        Thread hilo = threadRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Hilo no encontrado: " + id));
+                        "Thread no encontrado: " + id));
         return toDto(hilo);
     }
 
-    public List<HiloSummaryDto> getAllSummaries() {
-        return hiloRepository.findAll()
+    public List<ThreadSummaryDTO> getAllSummaries() {
+        return threadRepository.findAll()
                 .stream()
-                .map(h -> new HiloSummaryDto(h.getId(), h.getTitle()))
+                .map(h -> new ThreadSummaryDTO(h.getId(), h.getTitle()))
                 .toList();
     }
 
-    private HiloDto toDto(Hilo hilo) {
-        return new HiloDto(
+    private ThreadDTO toDto(Thread hilo) {
+        return new ThreadDTO(
                 hilo.getId(),
                 hilo.getTitle(),
                 hilo.getDescription(),
                 hilo.getOwner().getNickname(),
-                hilo.getComunidad().getNombre()
+                hilo.getCommunity().getName()
         );
     }
 }

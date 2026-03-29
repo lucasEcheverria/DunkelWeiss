@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import server.dao.UserRepository;
 import server.entity.User;
-import lib.dto.UserCredentialsDto;
+import lib.dto.UserCredentialsDTO;
 
 @Service
 public class AuthService {
@@ -64,7 +64,7 @@ public class AuthService {
 	 * Si ya existe un usuario con ese email, devuelve Optional.empty().
 	 * En caso contrario guarda y devuelve el usuario creado.
 	 */
-	public Optional<User> register(UserCredentialsDto credentials) {
+	public Optional<User> register(UserCredentialsDTO credentials) {
 		// Comprobar si ya existe un usuario con el mismo email
 		Optional<User> existing = userRepository.findByEmail(credentials.getEmail());
 		if (existing.isPresent()) {

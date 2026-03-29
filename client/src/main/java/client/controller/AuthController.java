@@ -1,7 +1,7 @@
 package client.controller;
 
 import client.service.AuthServiceProxy;
-import lib.dto.UserCredentialsDto;
+import lib.dto.UserCredentialsDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,7 +60,7 @@ public class AuthController {
     public String login(
             @RequestParam("email") String email,
             @RequestParam("password") String password) {
-        UserCredentialsDto credentials = new UserCredentialsDto();
+        UserCredentialsDTO credentials = new UserCredentialsDTO();
         credentials.setEmail(email);
         credentials.setPassword(password);
         boolean success = authService.login(credentials);
@@ -89,7 +89,7 @@ public class AuthController {
             @RequestParam("username") String username,
             @RequestParam("password") String password) {
         // Construct DTO and set email so the proxy sends it to the server
-        UserCredentialsDto credentials = new UserCredentialsDto(email, username, password);
+        UserCredentialsDTO credentials = new UserCredentialsDTO(email, username, password);
         boolean success = authService.register(credentials);
         if (success) {
             return "redirect:/";

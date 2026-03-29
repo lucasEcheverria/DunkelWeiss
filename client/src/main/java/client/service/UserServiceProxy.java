@@ -1,8 +1,8 @@
 package client.service;
 
 import client.config.AppConfig;
-import lib.dto.UpdateUserDto;
-import lib.dto.UserDto;
+import lib.dto.UpdateUserDTO;
+import lib.dto.UserDTO;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,17 +35,17 @@ public class UserServiceProxy {
      * Obtiene la información del usuario enviando el token en el body (texto plano),
      * tal y como espera el servidor en POST /api/users/me.
      */
-    public UserDto getCurrentUser(String token) {
+    public UserDTO getCurrentUser(String token) {
         if (token == null || token.isBlank()) return null;
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.TEXT_PLAIN);
             HttpEntity<String> request = new HttpEntity<>(token, headers);
 
-            ResponseEntity<UserDto> response = restTemplate.postForEntity(
+            ResponseEntity<UserDTO> response = restTemplate.postForEntity(
                     serverApiUrl + "/api/users/me",
                     request,
-                    UserDto.class
+                    UserDTO.class
             );
             if (response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();
@@ -62,7 +62,7 @@ public class UserServiceProxy {
      * Actualiza nickname/password. The token is taken from AuthServiceProxy and
      * a small JSON payload { token, nickname, password } is sent to the server.
      */
-    public UserDto updateUser(UpdateUserDto dto) {
+    public UserDTO updateUser(UpdateUserDTO dto) {
         if (dto == null) return null;
 
         String token = authService.getToken();
@@ -75,11 +75,11 @@ public class UserServiceProxy {
             body.put("password", dto.getPassword());
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body);
-            ResponseEntity<UserDto> response = restTemplate.exchange(
+            ResponseEntity<UserDTO> response = restTemplate.exchange(
                     serverApiUrl + "/api/users/me/update",
                     org.springframework.http.HttpMethod.PUT,
                     request,
-                    UserDto.class
+                    UserDTO.class
             );
             if (response.getStatusCode() == HttpStatus.OK) {
                 return response.getBody();

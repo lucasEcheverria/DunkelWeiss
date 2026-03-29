@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
  * DTO compartido entre cliente y servidor para transportar
  * las credenciales de autenticación del usuario.
  */
-public class UserCredentialsDto {
+public class UserCredentialsDTO {
 
 	/** Email de usuario, no puede estar vacío. */
     @NotBlank
@@ -25,14 +25,14 @@ public class UserCredentialsDto {
     private String password;
 
     // Constructor vacío requerido por Jackson para deserialización
-    public UserCredentialsDto() {}
+    public UserCredentialsDTO() {}
 
-    public UserCredentialsDto(String username, String password) {
+    public UserCredentialsDTO(String username, String password) {
         this.username = username;
         this.password = password;
     }
     
-    public UserCredentialsDto(String email, String username, String password) {
+    public UserCredentialsDTO(String email, String username, String password) {
 		this.email = email;
         this.username = username;
         this.password = password;
