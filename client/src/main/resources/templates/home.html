@@ -1,27 +1,442 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>DunkelWeiss</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            font-size: 3rem;
-            letter-spacing: 0.05em;
-            color: #1a1a1a;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunkelweiss - Comunidad y Hilos</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <h1>DunkelWeiss</h1>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <button class="icon-btn-ghost">☰</button>
+            <div class="brand-container">
+                <span class="brand-logo">🕸️</span>
+                <h1 class="brand-name">Dunkelweiss</h1>
+            </div>
+        </div>
+
+        <div class="nav-center">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Buscar hilos, comunidades o usuarios...">
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
+            <a href="/logout" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Logout</a>
+            <a href="/profile" class="nav-avatar" style="text-decoration: none;">D</a>
+        </div>
+    </div>
+</header>
+
+<div class="web-layout">
+
+    <aside class="left-panel">
+        <nav class="side-menu">
+            <a href="#" class="menu-item active"><span>↗️</span> Popular</a>
+            <a href="#" class="menu-item"><span>📰</span> Noticias</a>
+            <a href="#" class="menu-item"><span>🧭</span> Explorar</a>
+            <hr class="separator">
+            <p class="menu-label">RECURSOS</p>
+            <a href="#" class="menu-item"><span>👽</span> Acerca de nosotros</a>
+            <a href="#" class="menu-item"><span>📢</span> Anunciarse</a>
+            <a href="#" class="menu-item"><span>⚖️</span> Política de privacidad</a>
+        </nav>
+    </aside>
+
+    <main class="center-feed">
+
+        <div class="carousel-container">
+            <div class="carousel-slide active" style="background-image: url('https://picsum.photos/700/200?random=1');">
+                <div class="carousel-caption">Novedades del sistema</div>
+            </div>
+            <div class="carousel-slide" style="background-image: url('https://picsum.photos/700/200?random=2');">
+                <div class="carousel-caption">Actualizaciones de la comunidad</div>
+            </div>
+        </div>
+
+        <div class="reels-container">
+            <div class="reel-card" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://picsum.photos/200/300?random=4'); background-size: cover;">
+                <span class="reel-title">Nuevos Features</span>
+            </div>
+            <div class="reel-card" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://picsum.photos/200/300?random=5'); background-size: cover;">
+                <span class="reel-title">Tutoriales Express</span>
+            </div>
+            <div class="reel-card" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent), url('https://picsum.photos/200/300?random=6'); background-size: cover;">
+                <span class="reel-title">Reportes Diarios</span>
+            </div>
+        </div>
+
+        <div class="create-thread-container">
+            <div class="user-avatar">D</div>
+            <input type="text" class="create-input" placeholder="Crear nuevo registro / hilo...">
+            <button class="icon-btn">🖼️</button>
+            <button class="icon-btn">🔗</button>
+        </div>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">1.2k</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar">M</div>
+                    <span class="thread-author">u/MariaDev</span>
+                    <span>• hace 2 horas en d/DesarrolloWeb</span>
+                    <span class="thread-id">ID: REQ-1042</span>
+                </div>
+                <h2 class="thread-title">Actualización del módulo de base de datos principal</h2>
+                <div class="thread-desc">
+                    Se necesita migrar la tabla de usuarios actual a la nueva arquitectura. El objetivo es reducir los tiempos de consulta en un 40%. Este cambio afectará directamente a la pantalla de login, por lo que se debe hacer un respaldo previo.
+                </div>
+                <div class="thread-media" style="background-image: url('https://picsum.photos/700/400?random=10'); background-size: cover; background-position: center;"></div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 34 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">89</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #20b2aa;">C</div>
+                    <span class="thread-author">u/CarlosCode</span>
+                    <span>• hace 5 horas en d/DiseñoUX</span>
+                    <span class="thread-id">ID: BUG-8831</span>
+                </div>
+                <h2 class="thread-title">Error de visualización en pantallas menores a 768px</h2>
+                <div class="thread-desc">
+                    Los usuarios están reportando que al abrir la aplicación desde dispositivos móviles en modo vertical, las tarjetas de datos se superponen unas con otras, ocultando el campo ID y los botones de acción. Se requiere ajustar las reglas de CSS Grid urgentemente.
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 12 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">450</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #ff8c00;">A</div>
+                    <span class="thread-author">u/AdminBot</span>
+                    <span>• hace 1 día en d/Programacion</span>
+                    <span class="thread-id">ID: FEAT-2005</span>
+                </div>
+                <h2 class="thread-title">Implementación de modo oscuro persistente</h2>
+                <div class="thread-desc">
+                    Actualmente el botón de modo claro/oscuro funciona, pero si el usuario recarga la página, vuelve al tema por defecto. Hay que añadir una función que guarde la preferencia en el navegador. Por favor, reportad bugs aquí.
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 142 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">210</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #e84393;">L</div>
+                    <span class="thread-author">u/LauraSys</span>
+                    <span>• hace 2 días en d/Infraestructura</span>
+                    <span class="thread-id">ID: TASK-5099</span>
+                </div>
+                <h2 class="thread-title">Renovación de certificados SSL para el dominio principal</h2>
+                <div class="thread-desc">
+                    Los certificados actuales caducan en menos de 15 días. Hay que programar una ventana de mantenimiento de madrugada para realizar la actualización sin afectar el tráfico de usuarios en Europa y América Latina.
+                </div>
+                <div class="thread-media" style="background-image: url('https://picsum.photos/700/400?random=15'); background-size: cover; background-position: center;"></div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 28 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">95</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #00cec9;">P</div>
+                    <span class="thread-author">u/PabloSec</span>
+                    <span>• hace 3 días en d/Ciberseguridad</span>
+                    <span class="thread-id">ID: VULN-0012</span>
+                </div>
+                <h2 class="thread-title">Parche de seguridad en la librería de subida de imágenes</h2>
+                <div class="thread-desc">
+                    Se ha detectado una vulnerabilidad de tipo XSS en la versión antigua del componente de subida de avatares. Ya he subido un PR con la actualización de la dependencia y los tests pasando en verde.
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 51 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">342</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #6c5ce7;">J</div>
+                    <span class="thread-author">u/JuanTech</span>
+                    <span>• hace 3 días en d/InteligenciaArtificial</span>
+                    <span class="thread-id">ID: DISC-9021</span>
+                </div>
+                <h2 class="thread-title">¿Qué asistente de código os está dando mejores resultados últimamente?</h2>
+                <div class="thread-desc">
+                    Con todas las actualizaciones que han salido este último mes, estoy dudando si mantener mi suscripción actual o cambiar a uno de los nuevos modelos. He notado que en refactorización compleja a veces alucinan un poco. ¿Experiencias?
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 89 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">875</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #d63031;">S</div>
+                    <span class="thread-author">u/SysAdminOps</span>
+                    <span>• hace 4 días en d/Hardware</span>
+                    <span class="thread-id">ID: INFRA-332</span>
+                </div>
+                <h2 class="thread-title">Hemos terminado de instalar los nuevos racks para los servidores de base de datos</h2>
+                <div class="thread-desc">
+                    Ha sido un fin de semana largo, pero el nuevo centro de datos ya está casi operativo. Dejo una foto de cómo ha quedado el cableado (sí, sé que el cable rojo de la derecha podría estar mejor puesto, no me matéis).
+                </div>
+                <div class="thread-media" style="background-image: url('https://picsum.photos/700/400?random=20'); background-size: cover; background-position: center;"></div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 112 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">120</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #0984e3;">F</div>
+                    <span class="thread-author">u/FrontEndNinja</span>
+                    <span>• hace 5 días en d/DesarrolloWeb</span>
+                    <span class="thread-id">ID: UI-774</span>
+                </div>
+                <h2 class="thread-title">Debate serio: CSS Grid vs Flexbox para el layout principal</h2>
+                <div class="thread-desc">
+                    Llevo años usando Flexbox para casi todo, pero últimamente veo a muchos puristas insistiendo en que Grid es la única forma correcta para el contenedor principal de la página, reservando Flex solo para componentes. ¿Qué opináis en vuestros equipos?
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 65 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">640</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #fdcb6e;">C</div>
+                    <span class="thread-author">u/CoffeeLover</span>
+                    <span>• hace 1 semana en d/OffTopic</span>
+                    <span class="thread-id">ID: OFFTOPIC-005</span>
+                </div>
+                <h2 class="thread-title">Mi setup cafetero para sobrevivir a las guardias de fin de semana</h2>
+                <div class="thread-desc">
+                    Acabo de comprar esta maravilla. Hace más ruido que un avión despegando, pero el espresso que saca a las 3 de la mañana me ha salvado la vida ya dos veces arreglando caídas de producción.
+                </div>
+                <div class="thread-media" style="background-image: url('https://picsum.photos/700/400?random=21'); background-size: cover; background-position: center;"></div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 45 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+        <article class="thread-card">
+            <div class="thread-votes">
+                <button class="vote-btn" title="Me gusta">👍</button>
+                <span class="vote-count">3.1k</span>
+                <button class="vote-btn" title="No me gusta">👎</button>
+            </div>
+            <div class="thread-content">
+                <div class="thread-header">
+                    <div class="thread-header-avatar" style="background-color: #ff8c00;">A</div>
+                    <span class="thread-author">u/AdminBot</span>
+                    <span>• hace 1 semana en d/AnunciosOficiales</span>
+                    <span class="thread-id">ID: REL-204</span>
+                </div>
+                <h2 class="thread-title">Notas del parche v2.4 - Mejoras de rendimiento y nuevos filtros</h2>
+                <div class="thread-desc">
+                    Ya está desplegada la versión 2.4. Hemos solucionado el bug de la barra de búsqueda y añadido filtros avanzados por etiquetas (tags) en la vista principal. Además, el tiempo de carga de las imágenes debería haberse reducido en un 30% gracias a la nueva CDN.
+                </div>
+                <div class="thread-actions">
+                    <button class="action-btn">💬 210 Comentarios</button>
+                    <button class="action-btn">↗️ Compartir</button>
+                    <button class="action-btn">🔖 Guardar</button>
+                </div>
+            </div>
+        </article>
+
+    </main>
+
+    <aside class="right-panel">
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">COMUNIDADES POPULARES</h3>
+            <ul class="community-list">
+                <li>
+                    <div class="comm-avatar">e</div>
+                    <div class="comm-info">
+                        <strong>d/DesarrolloWeb</strong>
+                        <span>2.4M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar">i</div>
+                    <div class="comm-info">
+                        <strong>d/Programacion</strong>
+                        <span>1.1M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #6c5ce7; color: white;">IA</div>
+                    <div class="comm-info">
+                        <strong>d/InteligenciaArtificial</strong>
+                        <span>980k miembros</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">MIS COMUNIDADES</h3>
+            <ul class="community-list">
+                <li>
+                    <div class="comm-avatar" style="background-color: #ff9f43; color: white;">CS</div>
+                    <div class="comm-info">
+                        <strong>d/CSS_Tricks</strong>
+                        <span>120k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #00cec9; color: white;">RE</div>
+                    <div class="comm-info">
+                        <strong>d/ReactJS</strong>
+                        <span>850k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #0984e3; color: white;">PY</div>
+                    <div class="comm-info">
+                        <strong>d/PythonDevs</strong>
+                        <span>1.5M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #d63031; color: white;">SV</div>
+                    <div class="comm-info">
+                        <strong>d/Servidores</strong>
+                        <span>45k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #e84393; color: white;">UX</div>
+                    <div class="comm-info">
+                        <strong>d/DiseñoUX</strong>
+                        <span>230k miembros</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">ESTADO DEL SISTEMA</h3>
+            <div class="status-list">
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot online"></span> Servidores Core
+                    </span>
+                    <span class="status-text">En línea</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot online"></span> Base de Datos
+                    </span>
+                    <span class="status-text">En línea</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot warning"></span> API Externa
+                    </span>
+                    <span class="status-text">Latencia alta</span>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+<script>
+    // Lógica del modo oscuro
+    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-theme');
+</script>
+
 </body>
 </html>
