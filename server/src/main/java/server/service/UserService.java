@@ -2,11 +2,11 @@ package server.service;
 
 import java.util.Optional;
 
+import lib.dto.UserDTO;
 import org.springframework.stereotype.Service;
 
 import server.entity.User;
-import lib.dto.UserDto;
-import lib.dto.UpdateUserDto;
+import lib.dto.UpdateUserDTO;
 import server.dao.UserRepository;
 
 @Service
@@ -24,9 +24,9 @@ public class UserService {
      * Obtiene la información pública del usuario asociado al token.
      *
      * @param token token de sesión
-     * @return Optional con UserDto si el token es válido, vacío en caso contrario
+     * @return Optional con UserDTO si el token es válido, vacío en caso contrario
      */
-    public Optional<UserDto> getUserByToken(String token) {
+    public Optional<UserDTO> getUserByToken(String token) {
         if (token == null || token.isBlank()) {
             return Optional.empty();
         }
@@ -43,9 +43,9 @@ public class UserService {
      *
      * @param token token de sesión
      * @param dto datos a actualizar
-     * @return Optional con UserDto actualizado si el token es válido, vacío en caso contrario
+     * @return Optional con UserDTO actualizado si el token es válido, vacío en caso contrario
      */
-    public Optional<UserDto> updateUserByToken(String token, UpdateUserDto dto) {
+    public Optional<UserDTO> updateUserByToken(String token, UpdateUserDTO dto) {
         if (token == null || token.isBlank() || dto == null) {
             return Optional.empty();
         }
@@ -74,7 +74,7 @@ public class UserService {
         return Optional.of(toDto(user));
     }
 
-    private UserDto toDto(User user) {
-        return new UserDto(user.getId(), user.getEmail(), user.getNickname());
+    private UserDTO toDto(User user) {
+        return new UserDTO(user.getId(), user.getEmail(), user.getNickname());
     }
 }

@@ -1,7 +1,7 @@
 package client.service;
 
 import client.config.AppConfig;
-import lib.dto.HiloDto;
+import lib.dto.ThreadDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -35,11 +35,11 @@ public class HiloServiceProxy {
      * @param query texto a buscar
      * @return lista de hilos que coinciden con la búsqueda
      */
-    public List<HiloDto> buscarHilos(String query) {
+    public List<ThreadDTO> buscarHilos(String query) {
         try {
-            HiloDto[] resultado = restTemplate.getForObject(
+            ThreadDTO[] resultado = restTemplate.getForObject(
                     serverApiUrl + "/api/hilos/search?q=" + query,
-                    HiloDto[].class
+                    ThreadDTO[].class
             );
             return resultado != null ? Arrays.asList(resultado) : Collections.emptyList();
         } catch (HttpClientErrorException e) {

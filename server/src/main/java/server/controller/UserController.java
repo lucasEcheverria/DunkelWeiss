@@ -3,8 +3,8 @@ package server.controller;
 import java.util.Map;
 import java.util.Optional;
 
-import lib.dto.UserDto;
-import lib.dto.UpdateUserDto;
+import lib.dto.UserDTO;
+import lib.dto.UpdateUserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,14 +37,14 @@ public class UserController {
         }
     )
     @PostMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser(
+    public ResponseEntity<UserDTO> getCurrentUser(
             @RequestBody String token) {
 
         if (token == null || token.isBlank()) {
         	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        Optional<UserDto> userOpt = userService.getUserByToken(token);
+        Optional<UserDTO> userOpt = userService.getUserByToken(token);
         if (userOpt.isPresent()) {
             return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
         } else {
@@ -62,7 +62,7 @@ public class UserController {
         }
     )
     @PutMapping("/me/update")
-    public ResponseEntity<UserDto> updateCurrentUser(
+    public ResponseEntity<UserDTO> updateCurrentUser(
             @RequestBody Map<String, Object> body) {
 
         if (body == null) {
@@ -82,9 +82,9 @@ public class UserController {
         Object passObj = body.get("password");
         if (passObj instanceof String) password = (String) passObj;
 
-        UpdateUserDto dto = new UpdateUserDto(nickname, password);
+        UpdateUserDTO dto = new UpdateUserDTO(nickname, password);
 
-        Optional<UserDto> updated = userService.updateUserByToken(token, dto);
+        Optional<UserDTO> updated = userService.updateUserByToken(token, dto);
         if (updated.isPresent()) {
             return new ResponseEntity<>(updated.get(), HttpStatus.OK);
         } else {

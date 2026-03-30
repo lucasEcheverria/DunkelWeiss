@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 /**
  * DTO para enviar la información pública del usuario al cliente.
  */
-public class UserDto {
+public class UserDTO {
 	
 	/** id de usuario, no puede estar vacío. */
     @NotBlank
@@ -25,9 +25,9 @@ public class UserDto {
     private String username;
 
     // Jackson necesita constructor vacío
-    public UserDto() {}
+    public UserDTO() {}
 
-    public UserDto(Integer id, String email, String username) {
+    public UserDTO(Integer id, String email, String username) {
         this.id = id;
         this.email = email;
         this.username = username;

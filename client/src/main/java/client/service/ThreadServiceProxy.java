@@ -1,13 +1,12 @@
 package client.service;
 
 import client.config.AppConfig;
-import lib.dto.CreateHiloDto;
-import lib.dto.HiloDto;
-import lib.dto.HiloSummaryDto;
+import lib.dto.CreateThreadDTO;
+import lib.dto.ThreadDTO;
+import lib.dto.ThreadSummaryDTO;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -24,12 +23,12 @@ public class ThreadServiceProxy {
         this.serverApiUrl = appConfig.getServerApiUrl();
     }
 
-    public HiloDto createHilo(CreateHiloDto dto) {
+    public ThreadDTO createHilo(CreateThreadDTO dto) {
         try {
-            ResponseEntity<HiloDto> response = restTemplate.postForEntity(
+            ResponseEntity<ThreadDTO> response = restTemplate.postForEntity(
                     serverApiUrl + "/api/threads/create",
                     dto,
-                    HiloDto.class
+                    ThreadDTO.class
             );
             return response.getBody();
         } catch (Exception e) {
@@ -37,11 +36,11 @@ public class ThreadServiceProxy {
         }
     }
 
-    public HiloDto getHilo(Integer id) {
+    public ThreadDTO getHilo(Integer id) {
         try {
-            ResponseEntity<HiloDto> response = restTemplate.getForEntity(
+            ResponseEntity<ThreadDTO> response = restTemplate.getForEntity(
                     serverApiUrl + "/api/threads/get/" + id,
-                    HiloDto.class
+                    ThreadDTO.class
             );
             return response.getBody();
         } catch (Exception e) {
@@ -49,9 +48,9 @@ public class ThreadServiceProxy {
         }
     }
 
-    public List<HiloSummaryDto> getAllSummaries() {
+    public List<ThreadSummaryDTO> getAllSummaries() {
         try {
-            ResponseEntity<List<HiloSummaryDto>> response = restTemplate.exchange(
+            ResponseEntity<List<ThreadSummaryDTO>> response = restTemplate.exchange(
                     serverApiUrl + "/api/threads/getAll",
                     HttpMethod.GET,
                     null,

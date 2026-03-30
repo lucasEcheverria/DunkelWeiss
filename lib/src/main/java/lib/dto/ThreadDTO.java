@@ -3,7 +3,7 @@ package lib.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class HiloDto {
+public class ThreadDTO {
 
     @JsonProperty("id")
     private Integer id;
@@ -20,10 +20,10 @@ public class HiloDto {
     @JsonProperty("comunidadNombre")
     private String comunidadNombre;
 
-    public HiloDto() {}
+    public ThreadDTO() {}
 
-    public HiloDto(Integer id, String title, String description,
-                   String ownerUsername, String comunidadNombre) {
+    public ThreadDTO(Integer id, String title, String description,
+                     String ownerUsername, String comunidadNombre) {
         this.id             = id;
         this.title          = title;
         this.description    = description;
@@ -39,7 +39,7 @@ public class HiloDto {
 
     @Override
     public String toString() {
-        return "HiloDto{" +
+        return "ThreadDTO{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +

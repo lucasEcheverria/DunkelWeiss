@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * DTO para actualizar campos editables del usuario.
  * Solo incluye nickname y password por ahora.
  */
-public class UpdateUserDto {
+public class UpdateUserDTO {
 	
 	/** Nombre de usuario. */
     @JsonProperty("nickname")
@@ -16,9 +16,9 @@ public class UpdateUserDto {
     @JsonProperty("password")
     private String password;
 
-    public UpdateUserDto() {}
+    public UpdateUserDTO() {}
 
-    public UpdateUserDto(String nickname, String password) {
+    public UpdateUserDTO(String nickname, String password) {
         this.nickname = nickname;
         this.password = password;
     }
