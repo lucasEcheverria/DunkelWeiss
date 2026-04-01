@@ -16,7 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.service.ThreadService;
-
+import server.entity.Thread;
 import java.util.List;
 
 @Tag(
@@ -82,6 +82,22 @@ public class ThreadController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+    @GetMapping("/search")
+    public ResponseEntity<List<ThreadDTO>> searchThreads(
+            @Parameter(description = "Texto a buscar en título o descripción", example = "IDE", required = true)
+            @RequestParam String q) {
+        List<Thread> threads = threadService.searchThreads(q);
+        List<ThreadDTO> result = threads.stream()
+                .map(thread -> new ThreadDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null,
+                        thread.getCommunity() != null ? thread.getCommunity().getName() : null
+                ))
+                .toList();
+        return ResponseEntity.ok(result);
     }
 
     @Operation(
