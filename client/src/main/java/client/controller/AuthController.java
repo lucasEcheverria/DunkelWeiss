@@ -23,27 +23,27 @@ public class AuthController {
         this.authService = authService;
     }
 
-//    /**
-//     * Muestra la página de autenticación (sign in por defecto).
-//     * Si viene con ?error=true, añade el mensaje de error al modelo para
-//     * que Thymeleaf lo muestre en la vista.
-//     *
-//     * @param error  parámetro opcional de URL que indica si hubo un error previo
-//     * @param mode   parámetro opcional que indica si mostrar "signin" o "signup"
-//     * @param model  modelo de datos para la plantilla Thymeleaf
-//     * @return nombre de la plantilla a renderizar
-//     */
-//    @GetMapping("/")
-//    public String authPage(
-//            @RequestParam(value = "error", required = false) String error,
-//            @RequestParam(value = "mode", defaultValue = "signin") String mode,
-//            Model model) {
-//        if (error != null) {
-//            model.addAttribute("error", true);
-//        }
-//        model.addAttribute("mode", mode);
-//        return "auth";
-//    }
+    /**
+     * Muestra la página de autenticación (sign in por defecto).
+     * Si viene con ?error=true, añade el mensaje de error al modelo para
+     * que Thymeleaf lo muestre en la vista.
+     *
+     * @param error  parámetro opcional de URL que indica si hubo un error previo
+     * @param mode   parámetro opcional que indica si mostrar "signin" o "signup"
+     * @param model  modelo de datos para la plantilla Thymeleaf
+     * @return nombre de la plantilla a renderizar
+     */
+    @GetMapping("/auth")
+    public String authPage(
+            @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "mode", defaultValue = "signin") String mode,
+            Model model) {
+        if (error != null) {
+            model.addAttribute("error", true);
+        }
+        model.addAttribute("mode", mode);
+        return "auth";
+    }
 
     /**
      * Procesa el formulario de inicio de sesión.
