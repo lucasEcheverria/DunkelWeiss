@@ -2,6 +2,7 @@ package client.service;
 
 import client.config.AppConfig;
 import lib.dto.UserCredentialsDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,10 @@ public class AuthServiceProxy {
     // Token almacenado tras un inicio de sesión exitoso
     private String token;
 
-    public AuthServiceProxy(RestTemplate restTemplate, AppConfig appConfig) {
+    public AuthServiceProxy(RestTemplate restTemplate,
+                            @Value("${server.api.url}") String serverApiUrl) {
         this.restTemplate = restTemplate;
-        this.serverApiUrl = appConfig.getServerApiUrl();
+        this.serverApiUrl = serverApiUrl;
     }
 
     public boolean login(UserCredentialsDTO credentials) {

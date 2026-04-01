@@ -136,4 +136,10 @@ public class ThreadController {
     public ResponseEntity<List<ThreadSummaryDTO>> getAllSummaries() {
         return ResponseEntity.ok(threadService.getAllSummaries());
     }
+
+    // TODO IMPLEMENTATION LOGIC IS REQUIRED
+    @GetMapping("/thread_feed")
+    public ResponseEntity<List<ThreadSummaryDTO>> getThreadFeed() {
+        return ResponseEntity.ok(threadService.getAllSummaries());
+    }
 }

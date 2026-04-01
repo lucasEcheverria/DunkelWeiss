@@ -4,6 +4,7 @@ import client.config.AppConfig;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
 import lib.dto.ThreadSummaryDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,11 @@ public class ThreadServiceProxy {
     private final RestTemplate restTemplate;
     private final String       serverApiUrl;
 
-    public ThreadServiceProxy(RestTemplate restTemplate, AppConfig appConfig) {
+    // NO INYECTÉIS LA CLASE ENTERA DE APPCONFIG, usad las variables de entorno del properties
+    public ThreadServiceProxy(RestTemplate restTemplate,
+                              @Value("${server.api.url}") String serverApiUrl) {
         this.restTemplate = restTemplate;
-        this.serverApiUrl = appConfig.getServerApiUrl();
+        this.serverApiUrl = serverApiUrl;
     }
 
     public ThreadDTO createHilo(CreateThreadDTO dto) {

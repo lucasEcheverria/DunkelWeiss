@@ -3,6 +3,7 @@ package client.service;
 import client.config.AppConfig;
 import lib.dto.UpdateUserDTO;
 import lib.dto.UserDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,11 @@ public class UserServiceProxy {
     private final String serverApiUrl;
     private final AuthServiceProxy authService;
 
-    public UserServiceProxy(RestTemplate restTemplate, AppConfig appConfig, AuthServiceProxy authService) {
+    public UserServiceProxy(RestTemplate restTemplate,
+                            AuthServiceProxy authService,
+                            @Value("${server.api.url}") String serverApiUrl) {
         this.restTemplate = restTemplate;
-        this.serverApiUrl = appConfig.getServerApiUrl();
+        this.serverApiUrl = serverApiUrl;
         this.authService = authService;
     }
 
