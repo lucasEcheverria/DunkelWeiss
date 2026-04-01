@@ -1,27 +1,162 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>DunkelWeiss</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            font-size: 3rem;
-            letter-spacing: 0.05em;
-            color: #1a1a1a;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunkelweiss - Comunidad y Hilos</title>
+
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <h1>DunkelWeiss</h1>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <button class="icon-btn-ghost">☰</button>
+            <div class="brand-container">
+                <span class="brand-logo">🕸️</span>
+                <h1 class="brand-name">Dunkelweiss</h1>
+            </div>
+        </div>
+
+        <div class="nav-center">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Buscar hilos, comunidades o usuarios...">
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
+            <a href="/logout" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Logout</a>
+            <a th:href="@{/profile}" class="nav-avatar" style="text-decoration: none;">D</a>
+        </div>
+    </div>
+</header>
+
+<div class="web-layout">
+
+    <aside class="left-panel">
+        <nav class="side-menu">
+            <a href="#" class="menu-item active"><span>↗️</span> Popular</a>
+            <a href="#" class="menu-item"><span>+</span> Crear Hilo</a>
+            <a href="#" class="menu-item"><span>🧭</span> Explorar</a>
+            <hr class="separator">
+            <p class="menu-label">RECURSOS</p>
+            <a href="#" class="menu-item"><span>👽</span> Acerca de nosotros</a>
+            <a href="#" class="menu-item"><span>📢</span> Anunciarse</a>
+            <a href="#" class="menu-item"><span>⚖️</span> Política de privacidad</a>
+        </nav>
+    </aside>
+
+    <main class="center-feed">
+        <div th:each="thread : ${threadFeedList}">
+            <div th:replace="~{fragments/thread_box :: box(${thread})}"></div>
+        </div>
+    </main>
+
+    <aside class="right-panel">
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">COMUNIDADES POPULARES</h3>
+            <ul class="community-list">
+                <li>
+                    <div class="comm-avatar">e</div>
+                    <div class="comm-info">
+                        <strong>d/DesarrolloWeb</strong>
+                        <span>2.4M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar">i</div>
+                    <div class="comm-info">
+                        <strong>d/Programacion</strong>
+                        <span>1.1M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #6c5ce7; color: white;">IA</div>
+                    <div class="comm-info">
+                        <strong>d/InteligenciaArtificial</strong>
+                        <span>980k miembros</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">MIS COMUNIDADES</h3>
+            <ul class="community-list">
+                <li>
+                    <div class="comm-avatar" style="background-color: #ff9f43; color: white;">CS</div>
+                    <div class="comm-info">
+                        <strong>d/CSS_Tricks</strong>
+                        <span>120k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #00cec9; color: white;">RE</div>
+                    <div class="comm-info">
+                        <strong>d/ReactJS</strong>
+                        <span>850k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #0984e3; color: white;">PY</div>
+                    <div class="comm-info">
+                        <strong>d/PythonDevs</strong>
+                        <span>1.5M miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #d63031; color: white;">SV</div>
+                    <div class="comm-info">
+                        <strong>d/Servidores</strong>
+                        <span>45k miembros</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="comm-avatar" style="background-color: #e84393; color: white;">UX</div>
+                    <div class="comm-info">
+                        <strong>d/DiseñoUX</strong>
+                        <span>230k miembros</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="dunkel-widget">
+            <h3 class="widget-header-text">ESTADO DEL SISTEMA</h3>
+            <div class="status-list">
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot online"></span> Servidores Core
+                    </span>
+                    <span class="status-text">En línea</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot online"></span> Base de Datos
+                    </span>
+                    <span class="status-text">En línea</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">
+                        <span class="status-dot warning"></span> API Externa
+                    </span>
+                    <span class="status-text">Latencia alta</span>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+</div>
+
+<script>
+    // Lógica del modo oscuro
+    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-theme');
+</script>
+
 </body>
 </html>

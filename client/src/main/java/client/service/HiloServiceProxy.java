@@ -2,6 +2,7 @@ package client.service;
 
 import client.config.AppConfig;
 import lib.dto.ThreadDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -21,9 +22,10 @@ public class HiloServiceProxy {
     private final RestTemplate restTemplate;
     private final String serverApiUrl;
 
-    public HiloServiceProxy(RestTemplate restTemplate, AppConfig appConfig) {
+    public HiloServiceProxy(RestTemplate restTemplate,
+                            @Value("${server.api.url}") String serverApiUrl) {
         this.restTemplate = restTemplate;
-        this.serverApiUrl = appConfig.getServerApiUrl();
+        this.serverApiUrl = serverApiUrl;
     }
 
     /**

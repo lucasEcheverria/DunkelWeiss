@@ -57,7 +57,7 @@ public class ThreadService {
     public List<ThreadSummaryDTO> getAllSummaries() {
         return threadRepository.findAll()
                 .stream()
-                .map(h -> new ThreadSummaryDTO(h.getId(), h.getTitle()))
+                .map(h -> new ThreadSummaryDTO(h.getId(), h.getTitle(), h.getDescription(), h.getOwner().getNickname()))
                 .toList();
     }
 
