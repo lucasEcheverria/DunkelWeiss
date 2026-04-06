@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS communities (
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    email varchar(255) NOT NULL,
+    email varchar(255) NOT NULL UNIQUE,
     nickname varchar(255) NOT NULL,
     password varchar(255) NOT NULL
 );
