@@ -44,4 +44,14 @@ public class ThreadController {
         threadService.createHilo(new CreateThreadDTO(title, description, comunidadId, ownerId));
         return "redirect:/threads";
     }
+    @GetMapping("/search")
+    public String searchThreads(
+            @RequestParam(value = "q", required = false, defaultValue = "") String query,
+            Model model) {
+        List<ThreadDTO> threads = threadService.searchThreads(query);
+        model.addAttribute("threads", threads);
+        model.addAttribute("query", query);
+        return "search";
+    }
+
 }

@@ -1,6 +1,5 @@
 package client.service;
 
-import client.config.AppConfig;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
 import lib.dto.ThreadSummaryDTO;
@@ -10,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,6 +60,17 @@ public class ThreadServiceProxy {
                     new ParameterizedTypeReference<>() {}
             );
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+    public List<ThreadDTO> searchThreads(String query) {
+        try {
+            ThreadDTO[] result = restTemplate.getForObject(
+                    serverApiUrl + "/api/threads/search?q=" + query,
+                    ThreadDTO[].class
+            );
+            return result != null ? Arrays.asList(result) : Collections.emptyList();
         } catch (Exception e) {
             return Collections.emptyList();
         }
