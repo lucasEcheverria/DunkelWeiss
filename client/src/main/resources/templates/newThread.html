@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nuevo hilo - DunkelWeiss</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+    <style>
+        .new-thread-container {
+            max-width: 720px;
+            margin: 80px auto 0 auto;
+            padding: 24px;
+        }
+        .form-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .form-card h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            background-color: var(--bg-surface-hover);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--brand-color);
+            box-shadow: 0 0 0 1px var(--brand-color);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .form-group select option {
+            background-color: var(--bg-surface);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <div class="brand-container">
+                <span class="brand-logo">🕸️</span>
+                <h1 class="brand-name">Dunkelweiss</h1>
+            </div>
+        </div>
+        <div class="nav-right">
+            <a href="/home" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Volver</a>
+        </div>
+    </div>
+</header>
+
+<div class="new-thread-container">
+    <div class="form-card">
+        <h2>Crear nuevo hilo</h2>
+
+        <form th:action="@{/threads/create}" method="post">
+            <div class="form-group">
+                <label for="title">Título</label>
+                <input type="text" id="title" name="title"
+                       placeholder="Dale un título a tu hilo" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description"
+                          placeholder="¿De qué trata tu hilo?"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="comunidadId">Comunidad</label>
+                <select id="comunidadId" name="comunidadId" required>
+                    <option value="" disabled selected>Selecciona una comunidad</option>
+                    <option th:each="comunidad : ${comunidades}"
+                            th:value="${comunidad.id()}"
+                            th:text="${comunidad.name()}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <a href="/home" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Cancelar</a>
+                <button type="submit" class="btn" style="background-color: var(--brand-color); color: white;">Publicar hilo</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
