@@ -4,71 +4,137 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Perfil - DunkelWeiss</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+
+    <!-- Pequeñas reglas locales para el layout de perfil -->
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
+        .dunkel-widget { max-width: 920px; padding: 28px; }
+        .tabs { display:flex; gap:8px; margin-bottom:16px; }
+        .tabs .tab-btn {
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.06);
+            padding: 8px 12px;
             border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-            width: 420px;
+            cursor: pointer;
+            font-weight: 600;
         }
-        h2 { margin-top: 0; }
-        .row { margin-bottom: 12px; }
-        label { display:block; font-size: 0.9rem; color: #333; margin-bottom: 6px; }
-        input[type=text], input[type=password] {
-            width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px;
+        .tabs .tab-btn:focus { outline: none; box-shadow: none; }
+        .tabs .tab-btn.active {
+            background-color: #1a73e8;
+            color: #fff;
+            border-color: #1a73e8;
         }
-        .readonly { background: #fafafa; }
-        button {
-            background: #1a73e8; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer;
+        .tabs .tab-btn.inactive {
+            background: transparent;
+            color: inherit;
         }
-        .muted { color: #666; font-size: 0.9rem; }
-        .error { color: #b00020; margin-bottom: 12px; }
-        .actions { display:flex; justify-content: space-between; align-items: center; }
+
+        .row { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+        label { font-size:0.95rem; color:#333; }
+        .label-white { color: #fff; }
+        .create-input {
+            width:100%;
+            padding:10px 12px;
+            border-radius:6px;
+            border:1px solid #ddd;
+            box-sizing: border-box;
+            font-size:0.95rem;
+        }
+        .create-input.readonly { background:#fafafa; }
+
+        .actions { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+        .error { color:#b00020; margin-bottom:12px; }
+
+        @media (max-width: 800px) {
+            .dunkel-widget { margin: 16px; padding: 18px; }
+        }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>Perfil de usuario</h2>
+<div class="web-layout">
+    <main class="center-feed">
+        <div class="dunkel-widget" style="margin: 32px auto;">
 
-    <div th:if="${param.error}">
-        <div class="error">Ocurrió un error al procesar la solicitud.</div>
-    </div>
+            <!-- Tabs superior -->
+            <div class="tabs">
+                <button id="tab-data" class="tab-btn active" type="button" onclick="showTab('data')">Mis datos</button>
+                <button id="tab-content" class="tab-btn inactive" type="button" onclick="showTab('content')">Mis hilos/posts</button>
+            </div>
 
-    <div class="row">
-        <label>Email</label>
-        <input type="text" th:value="${user.email}" class="readonly" readonly />
-    </div>
+            <!-- Contenedor de Mis Datos (visible por defecto) -->
+            <section id="section-data">
 
-    <form action="/profile/update" method="post">
-        <div class="row">
-            <label>Nickname</label>
-            <input type="text" name="nickname" th:value="${user.username}" />
+                <div th:if="${param.error}">
+                    <div class="error">Ocurrió un error al procesar la solicitud.</div>
+                </div>
+
+                <div class="row">
+                    <label class="label-white">Email</label>
+                    <input type="text" th:value="${user.email}" class="create-input readonly" readonly style="background:#cccccc; color:#111;" />
+                </div>
+
+                <form action="/profile/update" method="post">
+                    <div class="row">
+                        <label class="label-white">Nickname</label>
+                        <input type="text" name="nickname" th:value="${user.username}" class="create-input" />
+                    </div>
+
+                    <div class="row">
+                        <label class="label-white">Nueva contraseña</label>
+                        <input type="password" name="password" placeholder="" class="create-input" />
+                    </div>
+
+                    <div class="actions" style="margin-top:8px;">
+                        <div class="muted">ID: <span th:text="${user.id}"></span></div>
+                        <button type="submit" class="btn">Guardar</button>
+                    </div>
+                </form>
+
+            </section>
+
+            <!-- Contenedor de Mis hilos/posts (vacío por ahora) -->
+            <section id="section-content" style="display:none;">
+                <p class="muted">(Vacío por ahora)</p>
+                <!-- futuro: listado de hilos y posts del usuario -->
+            </section>
+
+            <div style="margin-top:16px; text-align:right;">
+                <a th:href="@{/home}" class="btn btn-outline">Volver</a>
+            </div>
         </div>
-
-        <div class="row">
-            <label>Nueva contraseña</label>
-            <input type="password" name="password" placeholder="" />
-        </div>
-
-        <div class="actions">
-            <div class="muted">ID: <span th:text="${user.id}"></span></div>
-            <button type="submit">Save</button>
-        </div>
-    </form>
-
-    <div style="margin-top:16px; text-align:right;">
-        <a href="/home" class="muted">Back</a>
-    </div>
+    </main>
 </div>
+
+<script>
+    // Inicializa la pestaña por defecto (mis datos)
+    function showTab(name) {
+        const data = document.getElementById('section-data');
+        const content = document.getElementById('section-content');
+        const tabData = document.getElementById('tab-data');
+        const tabContent = document.getElementById('tab-content');
+
+        if (name === 'data') {
+            data.style.display = '';
+            content.style.display = 'none';
+            tabData.classList.add('active');
+            tabData.classList.remove('inactive');
+            tabContent.classList.remove('active');
+            tabContent.classList.add('inactive');
+        } else {
+            data.style.display = 'none';
+            content.style.display = '';
+            tabData.classList.remove('active');
+            tabData.classList.add('inactive');
+            tabContent.classList.add('active');
+            tabContent.classList.remove('inactive');
+        }
+    }
+
+    // set default on load
+    document.addEventListener('DOMContentLoaded', function() {
+        showTab('data');
+    });
+</script>
 </body>
 </html>
