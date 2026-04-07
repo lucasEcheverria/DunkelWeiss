@@ -39,9 +39,8 @@ public class ThreadController {
     public String createThread(
             @RequestParam String title,
             @RequestParam(required = false) String description,
-            @RequestParam Integer comunidadId,
-            @RequestParam Integer ownerId) {
-        threadService.createHilo(new CreateThreadDTO(title, description, comunidadId, ownerId));
+            @RequestParam Integer comunidadId) {
+        threadService.createHilo(new CreateThreadDTO(title, description, comunidadId));
         return "redirect:/threads";
     }
 }

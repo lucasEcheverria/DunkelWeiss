@@ -12,8 +12,5 @@ public record CreateThreadDTO(
         String  description,
         @NotNull
         @JsonProperty("comunidadId")
-        Integer comunidadId,
-        @NotNull
-        @JsonProperty("ownerId")
-        Integer ownerId
+        Integer comunidadId
 ) {}
