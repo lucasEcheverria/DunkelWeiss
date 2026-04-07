@@ -45,13 +45,26 @@ public class ThreadController {
         return "redirect:/threads";
     }
     @GetMapping("/search")
-    public String searchThreads(
+    public String getThreadsWithPrompt(
             @RequestParam(value = "q", required = false, defaultValue = "") String query,
             Model model) {
-        List<ThreadDTO> threads = threadService.searchThreads(query);
-        model.addAttribute("threads", threads);
+        List<ThreadSummaryDTO> threads = threadService.getThreadsWithPrompt(query).stream()
+                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .toList();
+        model.addAttribute("threadFeedList", threads);
         model.addAttribute("query", query);
-        return "search";
+        return "home";
+    }
+
+    @GetMapping("/user")
+    public String getThreadsFromUser(
+            @RequestParam String email,
+            Model model) {
+        List<ThreadSummaryDTO> threads = threadService.getThreadsFromUser(email).stream()
+                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .toList();
+        model.addAttribute("threadFeedList", threads);
+        return "home";
     }
 
 }

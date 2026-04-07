@@ -9,9 +9,7 @@ import java.util.List;
 @Repository
 public interface ThreadRepository extends JpaRepository<Thread, Integer> {
 
-    List<Thread> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-            String title, String description
-    );
-
+    List<Thread> findByTitleContainingIgnoreCase(String title);
+    List<Thread> findByOwnerEmail(String email);
 
 }

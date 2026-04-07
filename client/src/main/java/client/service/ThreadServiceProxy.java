@@ -64,13 +64,29 @@ public class ThreadServiceProxy {
             return Collections.emptyList();
         }
     }
-    public List<ThreadDTO> searchThreads(String query) {
+    public List<ThreadDTO> getThreadsWithPrompt(String query) {
         try {
-            ThreadDTO[] result = restTemplate.getForObject(
+            ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
                     serverApiUrl + "/api/threads/search?q=" + query,
-                    ThreadDTO[].class
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
             );
-            return result != null ? Arrays.asList(result) : Collections.emptyList();
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ThreadDTO> getThreadsFromUser(String email) {
+        try {
+            ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/user?email=" + email,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (Exception e) {
             return Collections.emptyList();
         }
