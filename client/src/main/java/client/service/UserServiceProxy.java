@@ -1,11 +1,11 @@
 package client.service;
 
-import client.config.AppConfig;
 import lib.dto.UpdateUserDTO;
 import lib.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,18 +35,18 @@ public class UserServiceProxy {
     }
 
     /**
-     * Obtiene la información del usuario enviando el token en el body (texto plano),
-     * tal y como espera el servidor en POST /api/users/me.
+     * Obtiene la información del usuario enviando el token en el Authorization header (Bearer),
      */
     public UserDTO getCurrentUser(String token) {
         if (token == null || token.isBlank()) return null;
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.TEXT_PLAIN);
-            HttpEntity<String> request = new HttpEntity<>(token, headers);
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
 
-            ResponseEntity<UserDTO> response = restTemplate.postForEntity(
+            ResponseEntity<UserDTO> response = restTemplate.exchange(
                     serverApiUrl + "/api/users/me",
+                    HttpMethod.GET,
                     request,
                     UserDTO.class
             );
@@ -62,8 +62,7 @@ public class UserServiceProxy {
     }
 
     /**
-     * Actualiza nickname/password. The token is taken from AuthServiceProxy and
-     * a small JSON payload { token, nickname, password } is sent to the server.
+     * Actualiza nickname/password.
      */
     public UserDTO updateUser(UpdateUserDTO dto) {
         if (dto == null) return null;
@@ -73,14 +72,18 @@ public class UserServiceProxy {
 
         try {
             Map<String, Object> body = new HashMap<>();
-            body.put("token", token);
             body.put("nickname", dto.getNickname());
             body.put("password", dto.getPassword());
 
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body);
+            // include Authorization: Bearer <token> header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
             ResponseEntity<UserDTO> response = restTemplate.exchange(
                     serverApiUrl + "/api/users/me/update",
-                    org.springframework.http.HttpMethod.PUT,
+                    HttpMethod.PUT,
                     request,
                     UserDTO.class
             );
