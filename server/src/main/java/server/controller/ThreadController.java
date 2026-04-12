@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
@@ -15,8 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.service.ThreadService;
 import server.entity.Thread;
+import server.entity.User;
+import server.service.AuthService;
+import server.service.ThreadService;
+
 import java.util.List;
 
 @Tag(
@@ -28,14 +32,16 @@ import java.util.List;
 public class ThreadController {
 
     private final ThreadService threadService;
+    private final AuthService authService;
 
-    public ThreadController(ThreadService threadService) {
+    public ThreadController(ThreadService threadService, AuthService authService) {
+        this.authService = authService;
         this.threadService = threadService;
     }
 
     @Operation(
             summary = "Crear un hilo",
-            description = "Crea un nuevo hilo de discusión asociado a una comunidad y a un usuario propietario."
+            description = "Crea un nuevo hilo de discusión asociado a una comunidad. El propietario se resuelve automáticamente desde el token de sesión."
     )
     @ApiResponses({
             @ApiResponse(
@@ -48,11 +54,21 @@ public class ThreadController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "El usuario o la comunidad indicados no existen",
+                    description = "La comunidad indicada no existe",
                     content = @Content(
                             mediaType = MediaType.TEXT_PLAIN_VALUE,
-                            examples = @ExampleObject(value = "Usuario no encontrado: 99")
+                            examples = @ExampleObject(value = "Community no encontrada: 99")
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado: falta el token o no tiene formato Bearer",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Token inválido o sesión expirada",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
             )
     })
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -64,20 +80,42 @@ public class ThreadController {
                     examples = @ExampleObject(
                             name = "Ejemplo básico",
                             value = """
-                {
-                  "title": "¿Cuál es el mejor IDE?",
-                  "description": "Debatimos sobre IntelliJ, VS Code y Neovim.",
-                  "comunidadId": 1,
-                  "ownerId": 1
-                }
-                """
+                        {
+                          "title": "¿Cuál es el mejor IDE?",
+                          "description": "Debatimos sobre IntelliJ, VS Code y Neovim.",
+                          "comunidadId": 1
+                        }
+                        """
                     )
             )
     )
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/create")
-    public ResponseEntity<?> createHilo(@RequestBody CreateThreadDTO dto) {
+    public ResponseEntity<?> createHilo(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestBody CreateThreadDTO dto) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Debes iniciar sesión para crear un hilo.");
+        }
+
+        String token = authHeader.substring(7);
+        User user = authService.getUserByToken(token);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Tu sesión no es válida. Vuelve a iniciar sesión.");
+        }
+
         try {
-            ThreadDTO created = threadService.createHilo(dto);
+            ThreadDTO created = threadService.createHilo(dto, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

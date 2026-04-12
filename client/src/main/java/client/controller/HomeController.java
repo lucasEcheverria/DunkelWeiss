@@ -31,7 +31,7 @@ public class HomeController {
      * a
      * I'm using a test object for now
      */
-    @GetMapping({"/", "/home"})
+    @GetMapping("/home")
     public String showDashboard(Model model) {
         //REMOVE
         ThreadSummaryDTO th1 = new ThreadSummaryDTO(1, "Hilo de prueba 1", "Descripción del hilo de prueba 1", "Usuario1");

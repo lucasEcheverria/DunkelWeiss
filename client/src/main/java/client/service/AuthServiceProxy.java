@@ -3,10 +3,7 @@ package client.service;
 import client.config.AppConfig;
 import lib.dto.UserCredentialsDTO;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -101,6 +98,29 @@ public class AuthServiceProxy {
         } catch (HttpClientErrorException e) {
             return false;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean validateSession() {
+        if (this.token == null) return false;
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(this.token);
+            HttpEntity<?> request = new HttpEntity<>(headers);
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    serverApiUrl + "/auth/validate",
+                    HttpMethod.GET,
+                    request,
+                    Void.class
+            );
+            System.out.println("VALIDATE STATUS: " + response.getStatusCode());
+            return response.getStatusCode() == HttpStatus.OK;
+        } catch (HttpClientErrorException e) {
+            System.out.println("VALIDATE ERROR: " + e.getStatusCode());
+            return false;
+        } catch (Exception e) {
+            System.out.println("VALIDATE EXCEPTION: " + e.getMessage());
             return false;
         }
     }
