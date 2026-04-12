@@ -29,23 +29,23 @@ public class ThreadController {
     }
 
     @GetMapping("/new")
-    public String showThreadWindow(Model model) {
-        model.addAttribute("comunidades", communityService.getAll());
+    public String showNewThreadForm(Model model) {
+        model.addAttribute("communities", communityService.getAll());
         return "newThread";
     }
 
     @GetMapping
     public String listThreads(Model model) {
-        List<ThreadSummaryDTO> hilos = threadService.getAllSummaries();
-        model.addAttribute("hilos", hilos);
+        List<ThreadSummaryDTO> threads = threadService.getAllSummaries();
+        model.addAttribute("threads", threads);
         return "threads/list";
     }
 
     @GetMapping("/{id}")
     public String getThread(@PathVariable Integer id, Model model) {
-        ThreadDTO hilo = threadService.getHilo(id);
-        if (hilo == null) return "redirect:/threads";
-        model.addAttribute("hilo", hilo);
+        ThreadDTO thread = threadService.getThread(id);
+        if (thread == null) return "redirect:/threads";
+        model.addAttribute("thread", thread);
         return "threads/detail";
     }
 
@@ -53,10 +53,10 @@ public class ThreadController {
     public String createThread(
             @RequestParam String title,
             @RequestParam(required = false) String description,
-            @RequestParam Integer comunidadId) {
-        ThreadDTO created = threadService.createHilo(new CreateThreadDTO(title, description, comunidadId));
+            @RequestParam Integer communityId) {
+        ThreadDTO created = threadService.createThread(new CreateThreadDTO(title, description, communityId));
         if (created == null) {
-            return "redirect:/?error=true";
+            return "redirect:/auth?error=true";
         }
         return "redirect:/home";
     }
