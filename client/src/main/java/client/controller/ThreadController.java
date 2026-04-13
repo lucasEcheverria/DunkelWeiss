@@ -60,4 +60,27 @@ public class ThreadController {
         }
         return "redirect:/home";
     }
+    @GetMapping("/search")
+    public String getThreadsWithPrompt(
+            @RequestParam(value = "q", required = false, defaultValue = "") String query,
+            Model model) {
+        List<ThreadSummaryDTO> threads = threadService.getThreadsWithPrompt(query).stream()
+                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .toList();
+        model.addAttribute("threadFeedList", threads);
+        model.addAttribute("query", query);
+        return "home";
+    }
+
+    @GetMapping("/user")
+    public String getThreadsFromUser(
+            @RequestParam String email,
+            Model model) {
+        List<ThreadSummaryDTO> threads = threadService.getThreadsFromUser(email).stream()
+                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .toList();
+        model.addAttribute("threadFeedList", threads);
+        return "home";
+    }
+
 }

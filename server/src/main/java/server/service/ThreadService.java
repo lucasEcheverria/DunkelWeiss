@@ -56,9 +56,12 @@ public class ThreadService {
                 .map(h -> new ThreadSummaryDTO(h.getId(), h.getTitle(), h.getDescription(), h.getOwner().getNickname()))
                 .toList();
     }
-    public List<Thread> searchThreads(String query) {
-        return threadRepository
-                .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    public List<Thread> getThreadsWithPrompt(String query) {
+        return threadRepository.findByTitleContainingIgnoreCase(query);
+    }
+
+    public List<Thread> getThreadsFromUser(String email) {
+        return threadRepository.findByOwnerEmail(email);
     }
 
 

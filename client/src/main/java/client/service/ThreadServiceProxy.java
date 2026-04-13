@@ -10,6 +10,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -63,6 +64,33 @@ public class ThreadServiceProxy {
         try {
             ResponseEntity<List<ThreadSummaryDTO>> response = restTemplate.exchange(
                     serverApiUrl + "/api/threads/getAll",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+    public List<ThreadDTO> getThreadsWithPrompt(String query) {
+        try {
+            ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/search?q=" + query,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<ThreadDTO> getThreadsFromUser(String email) {
+        try {
+            ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/user?email=" + email,
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<>() {}
