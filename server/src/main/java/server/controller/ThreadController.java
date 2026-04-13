@@ -122,10 +122,27 @@ public class ThreadController {
         }
     }
     @GetMapping("/search")
-    public ResponseEntity<List<ThreadDTO>> searchThreads(
-            @Parameter(description = "Texto a buscar en título o descripción", example = "IDE", required = true)
+    public ResponseEntity<List<ThreadDTO>> getThreadsWithPrompt(
+            @Parameter(description = "Texto a buscar en título", example = "IDE", required = true)
             @RequestParam String q) {
-        List<Thread> threads = threadService.searchThreads(q);
+        List<Thread> threads = threadService.getThreadsWithPrompt(q);
+        List<ThreadDTO> result = threads.stream()
+                .map(thread -> new ThreadDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null,
+                        thread.getCommunity() != null ? thread.getCommunity().getName() : null
+                ))
+                .toList();
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<ThreadDTO>> getThreadsFromUser(
+            @Parameter(description = "Email del propietario", example = "test@test.com", required = true)
+            @RequestParam String email) {
+        List<Thread> threads = threadService.getThreadsFromUser(email);
         List<ThreadDTO> result = threads.stream()
                 .map(thread -> new ThreadDTO(
                         thread.getId(),
