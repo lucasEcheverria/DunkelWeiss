@@ -1,6 +1,5 @@
 package client.service;
 
-import client.service.AuthServiceProxy;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
 import lib.dto.ThreadSummaryDTO;
@@ -29,7 +28,7 @@ public class ThreadServiceProxy {
         this.serverApiUrl = serverApiUrl;
     }
 
-    public ThreadDTO createHilo(CreateThreadDTO dto) {
+    public ThreadDTO createThread(CreateThreadDTO dto) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(authService.getToken());
@@ -48,7 +47,7 @@ public class ThreadServiceProxy {
         }
     }
 
-    public ThreadDTO getHilo(Integer id) {
+    public ThreadDTO getThread(Integer id) {
         try {
             ResponseEntity<ThreadDTO> response = restTemplate.getForEntity(
                     serverApiUrl + "/api/threads/get/" + id,
