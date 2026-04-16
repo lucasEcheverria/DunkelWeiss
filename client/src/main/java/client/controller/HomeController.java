@@ -34,6 +34,7 @@ public class HomeController {
 
     @GetMapping({"/", "/home"})
     public String showDashboard(Model model) {
+
         // TODO: reemplazar por threadService.getAllSummaries() cuando esté listo
         ThreadSummaryDTO th1 = new ThreadSummaryDTO(1, "Hilo de prueba 1", "Descripción del hilo de prueba 1", "Usuario1");
         ThreadSummaryDTO th2 = new ThreadSummaryDTO(2, "Hilo de prueba 2", "Descripción del hilo de prueba 2", "Usuario2");

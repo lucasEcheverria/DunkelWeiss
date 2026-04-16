@@ -15,12 +15,14 @@
             <button class="icon-btn-ghost">☰</button>
             <div class="brand-container">
                 <span class="brand-logo">🕸️</span>
-                <h1 class="brand-name">Dunkelweiss</h1>
+                <a th:href="@{${@authServiceProxy.getToken() != null ? '/home' : '/auth'}}" style="text-decoration: none; color: inherit;">
+                    <h1 class="brand-name">Dunkelweiss</h1>
+                </a>
             </div>
         </div>
 
         <div class="nav-center">
-            <form th:action="@{/search}" method="GET" class="search-bar">
+            <form th:action="@{${@authServiceProxy.getToken() != null ? '/threads/search' : '/auth'}}" method="GET" class="search-bar">
                 <span class="search-icon">🔍</span>
                 <input type="text"
                        name="query"
@@ -31,9 +33,22 @@
 
         <div class="nav-right">
             <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
-            <a th:href="@{/auth}" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Log in</a>
-            <a href="/logout" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Logout</a>
-            <a th:href="@{/profile}" class="nav-avatar" style="text-decoration: none;">D</a>
+            <a th:if="${@authServiceProxy.getToken() == null}"
+               th:href="@{/auth}"
+               class="btn btn-outline"
+               style="text-decoration: none; display: flex; align-items: center;">
+                Log in
+            </a>
+            <a th:if="${@authServiceProxy.getToken() != null}"
+               th:href="@{/logout}"
+               class="btn btn-outline">
+                Logout
+            </a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/profile' : '/auth'}}"
+               class="nav-avatar"
+               style="text-decoration: none;">
+                D
+            </a>
         </div>
     </div>
 </header>
@@ -42,9 +57,16 @@
 
     <aside class="left-panel">
         <nav class="side-menu">
-            <a href="#" class="menu-item active"><span>↗️</span> Popular</a>
-            <a href="#" class="menu-item"><span>+</span> Crear Hilo</a>
+            <a th:href="@{/home}" class="menu-item active">
+                <span>↗️</span> Popular
+            </a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/threads/new' : '/auth'}}" class="menu-item">
+                <span>+</span> Crear Hilo
+            </a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/communities/new' : '/auth'}}" class="menu-item"><span>🏘️</span> Crear Comunidad</a>
+
             <a href="#" class="menu-item"><span>🧭</span> Explorar</a>
+
         </nav>
     </aside>
 
@@ -83,7 +105,7 @@
             </ul>
         </div>
 
-        <div class="dunkel-widget">
+        <div class="dunkel-widget" th:if="${@authServiceProxy.getToken() != null}">
             <h3 class="widget-header-text">MIS COMUNIDADES</h3>
             <ul class="community-list">
                 <li>

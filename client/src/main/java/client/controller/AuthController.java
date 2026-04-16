@@ -92,9 +92,17 @@ public class AuthController {
         UserCredentialsDTO credentials = new UserCredentialsDTO(email, username, password);
         boolean success = authService.register(credentials);
         if (success) {
-            return "redirect:/";
+            return "redirect:/home";
         }
         return "redirect:/?error=true&mode=signup";
+    }
+    @GetMapping("/logout")
+    public String logout() {
+        // Llamamos a tu metodo proxy para que borre el token
+        authService.logout();
+
+        // Te redirige a la página de login
+        return "redirect:/";
     }
 
 //    /**
