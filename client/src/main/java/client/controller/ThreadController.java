@@ -30,6 +30,11 @@ public class ThreadController {
 
     @GetMapping("/new")
     public String showNewThreadForm(Model model) {
+        // CORTAFUEGOS FIABLE: Comprobamos si tenemos el token guardado
+        if (authService.getToken() == null) {
+            return "redirect:/auth";
+        }
+
         model.addAttribute("communities", communityService.getAll());
         return "newThread";
     }
@@ -54,6 +59,12 @@ public class ThreadController {
             @RequestParam String title,
             @RequestParam(required = false) String description,
             @RequestParam Integer communityId) {
+
+        // CORTAFUEGOS FIABLE
+        if (authService.getToken() == null) {
+            return "redirect:/auth";
+        }
+
         ThreadDTO created = threadService.createThread(new CreateThreadDTO(title, description, communityId));
         if (created == null) {
             return "redirect:/auth?error=true";
@@ -64,8 +75,15 @@ public class ThreadController {
     public String getThreadsWithPrompt(
             @RequestParam(value = "q", required = false, defaultValue = "") String query,
             Model model) {
+
+        // --- ESTO ES LO ÚNICO NUEVO ---
+        if (authService.getToken() == null) {
+            return "redirect:/auth";
+        }
+        // ------------------------------
+
         List<ThreadSummaryDTO> threads = threadService.getThreadsWithPrompt(query).stream()
-                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .map(t -> new ThreadSummaryDTO(t.id(), t.title(), t.description(), t.ownerUsername()))
                 .toList();
         model.addAttribute("threadFeedList", threads);
         model.addAttribute("query", query);
@@ -77,7 +95,7 @@ public class ThreadController {
             @RequestParam String email,
             Model model) {
         List<ThreadSummaryDTO> threads = threadService.getThreadsFromUser(email).stream()
-                .map(t -> new ThreadSummaryDTO(t.getId(), t.getTitle(), t.getDescription(), t.getOwnerUsername()))
+                .map(t -> new ThreadSummaryDTO(t.id(), t.title(), t.description(), t.ownerUsername()))
                 .toList();
         model.addAttribute("threadFeedList", threads);
         return "home";

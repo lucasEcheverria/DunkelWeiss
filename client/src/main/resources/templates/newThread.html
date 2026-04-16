@@ -76,7 +76,9 @@
         <div class="nav-left">
             <div class="brand-container">
                 <span class="brand-logo">🕸️</span>
-                <h1 class="brand-name">Dunkelweiss</h1>
+                <a th:href="@{${@authServiceProxy.getToken() != null ? '/home' : '/auth'}}" style="text-decoration: none; color: inherit;">
+                    <h1 class="brand-name">Dunkelweiss</h1>
+                </a>
             </div>
         </div>
         <div class="nav-right">
@@ -103,10 +105,10 @@
             </div>
 
             <div class="form-group">
-                <label for="comunidadId">Comunidad</label>
-                <select id="comunidadId" name="comunidadId" required>
+                <label for="communityId">Comunidad</label>
+                <select id="communityId" name="communityId" required>
                     <option value="" disabled selected>Selecciona una comunidad</option>
-                    <option th:each="comunidad : ${comunidades}"
+                    <option th:each="comunidad : ${communities}"
                             th:value="${comunidad.id()}"
                             th:text="${comunidad.name()}">
                     </option>
