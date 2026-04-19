@@ -67,4 +67,16 @@ public class CommunityController {
     public ResponseEntity<List<CommunityDTO>> getTop5() {
         return ResponseEntity.ok(communityService.getTop5ByPopularity());
     }
+
+    @GetMapping("/my_communities")
+    public ResponseEntity<List<CommunityDTO>> getMyCommunities(
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            List<CommunityDTO> myCommunities = communityService.getUserCommunities(token);
+            return ResponseEntity.ok(myCommunities);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 }

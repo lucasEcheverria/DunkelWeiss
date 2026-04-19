@@ -36,10 +36,19 @@ public class HomeController {
     public String showDashboard(Model model) {
 
         List<ThreadSummaryDTO> threads = threadService.getAllSummaries();
-        List<CommunityDTO> top5 = communityService.getTop5();
 
         model.addAttribute("threadFeedList", threads);
-        model.addAttribute("top5Communities", top5);
+        String token = authService.getToken();
+        if (token == null) {
+            // NO LOGUEADO: Pedimos las top 5 y las pasamos al modelo
+            List<CommunityDTO> top5 = communityService.getTop5();
+            System.out.println(top5);
+            model.addAttribute("top5Communities", top5);
+        } else {
+            // LOGUEADO: Pedimos sus comunidades
+            List<CommunityDTO> myCommunities = communityService.getMyCommunities(token);
+            model.addAttribute("myCommunities", myCommunities);
+        }
         return "home";
     }
 

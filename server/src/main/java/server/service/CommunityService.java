@@ -59,6 +59,21 @@ public class CommunityService {
                 .toList();
     }
 
+    public List<CommunityDTO> getUserCommunities(String token) {
+        User cachedUser = authService.getUserByToken(token);
+        if (cachedUser == null) {
+            throw new IllegalArgumentException("Invalid Token");
+        }
+
+        User user = userRepository.findById(cachedUser.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return user.getcommunities()
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
     private CommunityDTO toDto(Community c) {
         return new CommunityDTO(c.getId(), c.getName(), c.getDescription());
     }

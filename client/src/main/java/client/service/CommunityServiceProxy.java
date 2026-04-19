@@ -67,4 +67,25 @@ public class CommunityServiceProxy {
             return Collections.emptyList();
         }
     }
+
+    public List<CommunityDTO> getMyCommunities(String token) {
+        try {
+            // Preparamos las cabeceras con el token del usuario
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            // Hacemos la petición GET (cambia la ruta "/api/communities/my" por la tuya)
+            ResponseEntity<List<CommunityDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/communities/my_communities",
+                    HttpMethod.GET,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList(); // Si falla (ej. error 404 porque no está hecho en el server aún), devuelve lista vacía
+        }
+    }
 }

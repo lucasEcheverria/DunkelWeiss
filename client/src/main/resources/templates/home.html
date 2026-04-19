@@ -79,71 +79,21 @@
 
     <aside class="right-panel">
 
-        <div class="dunkel-widget">
+        <div class="dunkel-widget" th:if="${@authServiceProxy.getToken() == null}">
             <h3 class="widget-header-text">COMUNIDADES POPULARES</h3>
             <ul class="community-list">
-                <li>
-                    <div class="comm-avatar">e</div>
-                    <div class="comm-info">
-                        <strong>d/DesarrolloWeb</strong>
-                        <span>2.4M miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar">i</div>
-                    <div class="comm-info">
-                        <strong>d/Programacion</strong>
-                        <span>1.1M miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar" style="background-color: #6c5ce7; color: white;">IA</div>
-                    <div class="comm-info">
-                        <strong>d/InteligenciaArtificial</strong>
-                        <span>980k miembros</span>
-                    </div>
-                </li>
+                <th:block th:each="community : ${top5Communities}">
+                    <li th:replace="~{fragments/popular_comunity :: box(${community})}"></li>
+                </th:block>
             </ul>
         </div>
 
         <div class="dunkel-widget" th:if="${@authServiceProxy.getToken() != null}">
             <h3 class="widget-header-text">MIS COMUNIDADES</h3>
             <ul class="community-list">
-                <li>
-                    <div class="comm-avatar" style="background-color: #ff9f43; color: white;">CS</div>
-                    <div class="comm-info">
-                        <strong>d/CSS_Tricks</strong>
-                        <span>120k miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar" style="background-color: #00cec9; color: white;">RE</div>
-                    <div class="comm-info">
-                        <strong>d/ReactJS</strong>
-                        <span>850k miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar" style="background-color: #0984e3; color: white;">PY</div>
-                    <div class="comm-info">
-                        <strong>d/PythonDevs</strong>
-                        <span>1.5M miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar" style="background-color: #d63031; color: white;">SV</div>
-                    <div class="comm-info">
-                        <strong>d/Servidores</strong>
-                        <span>45k miembros</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="comm-avatar" style="background-color: #e84393; color: white;">UX</div>
-                    <div class="comm-info">
-                        <strong>d/DiseñoUX</strong>
-                        <span>230k miembros</span>
-                    </div>
-                </li>
+                <th:block th:each="community : ${myCommunities}">
+                    <li th:replace="~{fragments/popular_comunity :: box(${community})}"></li>
+                </th:block>
             </ul>
         </div>
 
