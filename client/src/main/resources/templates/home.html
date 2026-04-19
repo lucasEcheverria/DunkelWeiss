@@ -22,13 +22,14 @@
         </div>
 
         <div class="nav-center">
-            <form th:action="@{${@authServiceProxy.getToken() != null ? '/threads/search' : '/auth'}}" method="GET" class="search-bar">
+            <form th:action="@{/threads/search}" method="GET" class="search-bar">
                 <span class="search-icon">🔍</span>
                 <input type="text"
                        name="query"
                        class="search-input"
                        placeholder="Buscar hilos, comunidades o usuarios..."
-                       th:value="${param.query}"> <button type="submit" style="display: none;">Buscar</button> </form>
+                       th:value="${param.query}"> <button type="submit" style="display: none;">Buscar</button>
+            </form>
         </div>
 
         <div class="nav-right">

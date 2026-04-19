@@ -35,14 +35,7 @@ public class HomeController {
     @GetMapping({"/", "/home"})
     public String showDashboard(Model model) {
 
-        // TODO: reemplazar por threadService.getAllSummaries() cuando esté listo
-        ThreadSummaryDTO th1 = new ThreadSummaryDTO(1, "Hilo de prueba 1", "Descripción del hilo de prueba 1", "Usuario1");
-        ThreadSummaryDTO th2 = new ThreadSummaryDTO(2, "Hilo de prueba 2", "Descripción del hilo de prueba 2", "Usuario2");
-        ThreadSummaryDTO th3 = new ThreadSummaryDTO(3, "Hilo de prueba 3", "Descripción del hilo de prueba 3", "Usuario3");
-        ThreadSummaryDTO th4 = new ThreadSummaryDTO(4, "Hilo de prueba 4", "Descripción del hilo de prueba 4", "Usuario4");
-        ThreadSummaryDTO th5 = new ThreadSummaryDTO(5, "Hilo de prueba 5", "Descripción del hilo de prueba 5", "Usuario5");
-
-        List<ThreadSummaryDTO> threads = List.of(th1, th2, th3, th4, th5);
+        List<ThreadSummaryDTO> threads = threadService.getAllSummaries();
         List<CommunityDTO> top5 = communityService.getTop5();
 
         model.addAttribute("threadFeedList", threads);
