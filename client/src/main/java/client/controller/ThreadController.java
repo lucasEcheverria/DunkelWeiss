@@ -3,6 +3,7 @@ package client.controller;
 import client.service.AuthServiceProxy;
 import client.service.CommunityServiceProxy;
 import client.service.ThreadServiceProxy;
+import lib.dto.CommunityDTO;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
 import lib.dto.ThreadSummaryDTO;
@@ -26,6 +27,18 @@ public class ThreadController {
         this.threadService = threadService;
         this.authService = authService;
         this.communityService = communityService;
+    }
+
+    @ModelAttribute
+    public void addCommunities(Model model){
+        String token = authService.getToken();
+        List<CommunityDTO> top5 = communityService.getTop5();
+        model.addAttribute("top5Communities", top5);
+        if (token != null) {
+            // LOGUEADO: Pedimos sus comunidades
+            List<CommunityDTO> myCommunities = communityService.getMyCommunities(token);
+            model.addAttribute("myCommunities", myCommunities);
+        }
     }
 
     @GetMapping("/new")
