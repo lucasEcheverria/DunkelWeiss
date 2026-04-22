@@ -34,10 +34,8 @@ public class HomeController {
 
     @GetMapping({"/", "/home"})
     public String showDashboard(Model model) {
+        List<ThreadSummaryDTO> threads = threadService.getInitialFeed();
 
-        List<ThreadSummaryDTO> threads = threadService.getAllSummaries();
-
-        model.addAttribute("threadFeedList", threads);
         String token = authService.getToken();
         if (token == null) {
             // NO LOGUEADO: Pedimos las top 5 y las pasamos al modelo
@@ -49,6 +47,8 @@ public class HomeController {
             List<CommunityDTO> myCommunities = communityService.getMyCommunities(token);
             model.addAttribute("myCommunities", myCommunities);
         }
+
+        model.addAttribute("threadFeedList", threads);
         return "home";
     }
 

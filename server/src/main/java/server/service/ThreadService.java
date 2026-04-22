@@ -74,4 +74,16 @@ public class ThreadService {
                 hilo.getCommunity().getName()
         );
     }
+
+    public List<ThreadSummaryDTO> getInitialFeed() {
+        return threadRepository.findTop10ByPostCount()
+                .stream()
+                .map(h -> new ThreadSummaryDTO(
+                        h.getId(),
+                        h.getTitle(),
+                        h.getDescription(),
+                        h.getOwner().getNickname()
+                ))
+                .toList();
+    }
 }
