@@ -10,6 +10,7 @@ import lib.dto.ThreadSummaryDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,21 +33,21 @@ public class HomeController {
         this.communityService = communityService;
     }
 
-    @GetMapping({"/", "/home"})
-    public String showDashboard(Model model) {
-        List<ThreadSummaryDTO> threads = threadService.getInitialFeed();
-
+    @ModelAttribute
+    public void addCommunities(Model model){
         String token = authService.getToken();
-        if (token == null) {
-            // NO LOGUEADO: Pedimos las top 5 y las pasamos al modelo
-            List<CommunityDTO> top5 = communityService.getTop5();
-            System.out.println(top5);
-            model.addAttribute("top5Communities", top5);
-        } else {
+        List<CommunityDTO> top5 = communityService.getTop5();
+        model.addAttribute("top5Communities", top5);
+        if (token != null) {
             // LOGUEADO: Pedimos sus comunidades
             List<CommunityDTO> myCommunities = communityService.getMyCommunities(token);
             model.addAttribute("myCommunities", myCommunities);
         }
+    }
+
+    @GetMapping({"/", "/home"})
+    public String showDashboard(Model model) {
+        List<ThreadSummaryDTO> threads = threadService.getInitialFeed();
 
         model.addAttribute("threadFeedList", threads);
         return "home";

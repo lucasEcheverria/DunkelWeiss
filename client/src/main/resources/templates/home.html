@@ -79,7 +79,7 @@
 
     <aside class="right-panel">
 
-        <div class="dunkel-widget" th:if="${@authServiceProxy.getToken() == null}">
+        <div class="dunkel-widget">
             <h3 class="widget-header-text">COMUNIDADES POPULARES</h3>
             <ul class="community-list">
                 <th:block th:each="community : ${top5Communities}">
