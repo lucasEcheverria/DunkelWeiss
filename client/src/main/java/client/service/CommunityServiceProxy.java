@@ -88,4 +88,23 @@ public class CommunityServiceProxy {
             return Collections.emptyList(); // Si falla (ej. error 404 porque no está hecho en el server aún), devuelve lista vacía
         }
     }
+
+    public boolean leaveCommunity(String token, Integer communityId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    serverApiUrl + "/api/communities/leave/" + communityId,
+                    HttpMethod.POST,
+                    request,
+                    Void.class
+            );
+
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

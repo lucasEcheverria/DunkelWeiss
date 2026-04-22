@@ -17,7 +17,7 @@ import java.util.List;
 public class ThreadService {
 
     private final ThreadRepository threadRepository;
-    private final UserRepository     userRepository;
+    private final UserRepository userRepository;
     private final CommunityRepository communityRepository;
 
     public ThreadService(ThreadRepository threadRepository,

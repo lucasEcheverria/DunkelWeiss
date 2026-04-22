@@ -79,4 +79,31 @@ public class CommunityController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    @Operation(
+            summary = "Abandonar comunidad",
+            description = "Permite a un usuario autenticado abandonar una comunidad.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Comunidad abandonada correctamente"),
+                    @ApiResponse(responseCode = "401", description = "Token inválido o no proporcionado"),
+                    @ApiResponse(responseCode = "404", description = "Comunidad no encontrada")
+            }
+    )
+    
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
+    @PostMapping("/leave/{id}")
+    public ResponseEntity<?> leaveCommunity(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @PathVariable Integer id) {
+        try {
+            if (authHeader == null || authHeader.isBlank()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+            String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+            communityService.leaveCommunity(token, id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 }

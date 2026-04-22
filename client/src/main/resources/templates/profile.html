@@ -46,6 +46,30 @@
 
         .error { color:#b00020; margin-bottom:12px; }
 
+        /* New styles for communities list (vertical, centered) */
+        .communities-list {
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            padding:8px 4px;
+            align-items:center;
+            width:100%;
+        }
+        .community-card {
+            width:90%;
+            max-width:720px;
+            background:#fff;
+            border:1px solid #e6e6e6;
+            border-radius:8px;
+            padding:12px 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+        .community-card h4 { margin:0 0 6px 0; font-size:1rem; }
+        .community-card p { margin:0; font-size:0.95rem; color:#555; }
+        .community-card .title { font-weight:700; }
+        .community-card .desc { color:#444; }
+
         @media (max-width: 800px) {
             .dunkel-widget { margin: 16px; padding: 18px; }
         }
@@ -54,12 +78,12 @@
 <body>
 <div class="web-layout">
     <main class="center-feed">
-        <div class="dunkel-widget" style="margin: 32px auto;">
+        <div class="dunkel-widget" style="margin: 32px auto;" th:attr="data-active-tab=${activeTab}">
 
             <!-- Tabs superior -->
             <div class="tabs">
                 <button id="tab-data" class="tab-btn active" type="button" onclick="showTab('data')">Mis datos</button>
-                <button id="tab-content" class="tab-btn inactive" type="button" onclick="showTab('content')">Mis hilos/posts</button>
+                <button id="tab-communities" class="tab-btn inactive" type="button" onclick="showTab('communities')">Mis Comunidades</button>
             </div>
 
             <!-- Contenedor de Mis Datos (visible por defecto) -->
@@ -93,11 +117,27 @@
 
             </section>
 
-            <!-- Contenedor de Mis hilos/posts (vacío por ahora) -->
-            <section id="section-content" style="display:none;">
-                <p class="muted">(Vacío por ahora)</p>
-                <!-- futuro: listado de hilos y posts del usuario -->
-            </section>
+            <!-- Contenedor de Comunidades -->
+            <section id="section-communities" style="display:none;">
+                <div th:if="${communities == null || #lists.isEmpty(communities)}">
+                    <p class="muted">Aún no has creado ninguna comunidad.</p>
+                </div>
+
+                <div th:if="${communities != null and !#lists.isEmpty(communities)}">
+                    <div class="communities-list">
+                        <div th:each="c : ${communities}" class="community-card" th:attr="data-id=${c.id}" th:onclick="|selectCommunity(this, ${c.id})|">
+                            <h4 class="title" th:text="${c.name}">Nombre comunidad</h4>
+                            <p class="desc" th:text="${c.description}" style="display:none; margin-top:8px;">Descripción de la comunidad</p>
+                        </div>
+                    </div>
+
+                    <!-- Form para seleccionar comunidades -->
+                    <form id="leaveForm" action="/profile/leaveCommunity" method="post" style="margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:center;">
+                        <input type="hidden" name="communityId" id="selectedCommunityId" />
+                        <button id="leaveBtn" type="submit" class="btn btn-danger" disabled>Dejar de seguir</button>
+                    </form>
+                 </div>
+              </section>
 
             <div style="margin-top:16px; text-align:right;">
                 <a th:href="@{/home}" class="btn btn-outline">Volver</a>
@@ -110,30 +150,78 @@
     // Inicializa la pestaña por defecto (mis datos)
     function showTab(name) {
         const data = document.getElementById('section-data');
-        const content = document.getElementById('section-content');
+        const communities = document.getElementById('section-communities');
         const tabData = document.getElementById('tab-data');
-        const tabContent = document.getElementById('tab-content');
+        const tabCommunities = document.getElementById('tab-communities');
 
         if (name === 'data') {
             data.style.display = '';
-            content.style.display = 'none';
+            communities.style.display = 'none';
             tabData.classList.add('active');
             tabData.classList.remove('inactive');
-            tabContent.classList.remove('active');
-            tabContent.classList.add('inactive');
+            tabCommunities.classList.remove('active');
+            tabCommunities.classList.add('inactive');
         } else {
             data.style.display = 'none';
-            content.style.display = '';
+            communities.style.display = '';
             tabData.classList.remove('active');
             tabData.classList.add('inactive');
-            tabContent.classList.add('active');
-            tabContent.classList.remove('inactive');
+            tabCommunities.classList.add('active');
+            tabCommunities.classList.remove('inactive');
         }
     }
 
-    // set default on load
+    // Stilo para la comunidad seleccionada
+    const SELECTED_CLASS = 'selected-community';
+
+    function selectCommunity(element, id) {
+        // Seleccionamos o deseleccionamos la comunidad clickeada
+        const already = element.classList.contains(SELECTED_CLASS);
+
+        // Limipiamos cualquier selección previa
+        document.querySelectorAll('.community-card').forEach(el => {
+            el.classList.remove(SELECTED_CLASS);
+            const d = el.querySelector('.desc'); if (d) d.style.display = 'none';
+        });
+
+        const input = document.getElementById('selectedCommunityId');
+        const btn = document.getElementById('leaveBtn');
+
+        if (already) {
+            if (input) input.value = '';
+            if (btn) btn.disabled = true;
+            return;
+        }
+
+        // Remarcamos la comunidad seleccionada y mostramos su descripción
+        element.classList.add(SELECTED_CLASS);
+        if (input) input.value = id;
+        if (btn) btn.disabled = false;
+        const desc = element.querySelector('.desc');
+        if (desc) desc.style.display = 'block';
+    }
+
+    // Estilos para la comunidad seleccionada y el botón de dejar comunidad
+    (function addSelectedStyle() {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .selected-community { outline: 2px solid #1a73e8; transform: translateY(-2px); }
+            .btn-danger { background:#b00020; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
+            .btn-danger[disabled] { opacity:0.6; cursor:not-allowed; }
+        `;
+        document.head.appendChild(style);
+    })();
+
+    // Poner la pestaña activa según el atributo data-active-tab del contenedor
     document.addEventListener('DOMContentLoaded', function() {
-        showTab('data');
+        try {
+            const root = document.querySelector('.dunkel-widget');
+            const active = root ? root.dataset.activeTab : null;
+            if (active === 'communities') showTab('communities');
+            else showTab('data');
+        } catch (e) {
+            showTab('data');
+        }
     });
 </script>
 </body>
