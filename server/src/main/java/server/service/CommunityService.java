@@ -74,6 +74,27 @@ public class CommunityService {
                 .toList();
     }
 
+    /**
+     * Elimina la relación entre el usuario y la comunidad.
+     * NO ELIMINA LA COMUNIDAD EN SI MISMA.
+     */
+    public void leaveCommunity(String token, Integer communityId) {
+        User cachedUser = authService.getUserByToken(token);
+        if (cachedUser == null) {
+            throw new IllegalArgumentException("Invalid Token");
+        }
+
+        User user = userRepository.findById(cachedUser.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new IllegalArgumentException("Community not found"));
+
+        if (user.getcommunities() != null && user.getcommunities().removeIf(c -> c.getId().equals(community.getId()))) {
+            userRepository.save(user);
+        }
+    }
+
     private CommunityDTO toDto(Community c) {
         return new CommunityDTO(c.getId(), c.getName(), c.getDescription());
     }

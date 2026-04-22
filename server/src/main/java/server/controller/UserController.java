@@ -10,9 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.service.UserService;
@@ -30,31 +31,37 @@ public class UserController {
     
     @Operation(
         summary = "Obtener información del usuario actual",
-        description = "Devuelve la información pública del usuario asociado al token proporcionado en el body.",
+        description = "Devuelve la información pública del usuario asociado al token proporcionado en la cabecera Authorization.",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK: Usuario encontrado, devuelve información del usuario"),
             @ApiResponse(responseCode = "401", description = "No autorizado: Token inválido o no proporcionado, acceso denegado"),
         }
     )
-    @PostMapping("/me")
+    @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(
-            @RequestBody String token) {
+            @RequestHeader(value = "Authorization", required = true) String authHeader) {
+
+        String token = null;
+        if (authHeader != null && !authHeader.isBlank()) {
+            if (authHeader.startsWith("Bearer ")) token = authHeader.substring(7);
+            else token = authHeader;
+        }
 
         if (token == null || token.isBlank()) {
-        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         Optional<UserDTO> userOpt = userService.getUserByToken(token);
         if (userOpt.isPresent()) {
             return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
         } else {
-        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
     @Operation(
         summary = "Actualizar nickname y/o contraseña del usuario actual",
-        description = "Actualiza los campos modificables del usuario asociado al token proporcionado en el body. Si un campo está ausente o vacío no se modifica.",
+        description = "Actualiza los campos modificables del usuario asociado al token proporcionado en la cabecera Authorization. Si un campo está ausente o vacío no se modifica.",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK: Usuario actualizado"),
             @ApiResponse(responseCode = "400", description = "Bad Request: DTO inválido"),
@@ -63,17 +70,22 @@ public class UserController {
     )
     @PutMapping("/me/update")
     public ResponseEntity<UserDTO> updateCurrentUser(
-            @RequestBody Map<String, Object> body) {
+            @RequestHeader(value = "Authorization", required = true) String authHeader,
+            @RequestBody(required = false) Map<String, Object> body) {
 
         if (body == null) {
-        	return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            body = Map.of();
         }
 
-        Object tokenObj = body.get("token");
-        if (tokenObj == null || !(tokenObj instanceof String) || ((String) tokenObj).isBlank()) {
-        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        String token = null;
+        if (authHeader != null && !authHeader.isBlank()) {
+            if (authHeader.startsWith("Bearer ")) token = authHeader.substring(7);
+            else token = authHeader;
         }
-        String token = (String) tokenObj;
+
+        if (token == null || token.isBlank()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
 
         String nickname = null;
         String password = null;
