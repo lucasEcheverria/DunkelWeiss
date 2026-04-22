@@ -73,20 +73,13 @@ public class ThreadController {
     }
     @GetMapping("/search")
     public String getThreadsWithPrompt(
-            @RequestParam(value = "q", required = false, defaultValue = "") String query,
+            @RequestParam(value = "query", required = false, defaultValue = "") String query,
             Model model) {
-
-        // --- ESTO ES LO ÚNICO NUEVO ---
-        if (authService.getToken() == null) {
-            return "redirect:/auth";
-        }
-        // ------------------------------
 
         List<ThreadSummaryDTO> threads = threadService.getThreadsWithPrompt(query).stream()
                 .map(t -> new ThreadSummaryDTO(t.id(), t.title(), t.description(), t.ownerUsername()))
                 .toList();
         model.addAttribute("threadFeedList", threads);
-        model.addAttribute("query", query);
         return "home";
     }
 

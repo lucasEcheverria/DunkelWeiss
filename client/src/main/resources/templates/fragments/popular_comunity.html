@@ -1,0 +1,17 @@
+<li th:fragment="box(community)" th:if="${community != null}">
+    <th:block th:with="colors=${ {'#ff9f43', '#00b894', '#0984e3', '#e84393', '#6c5ce7', '#d63031', '#fdcb6e'} },
+                       colorIndex=${community.id() % 7},
+                       bgColor=${colors[colorIndex]}">
+
+        <div class="comm-avatar"
+             th:style="'background-color: ' + ${bgColor} + '; color: white;'"
+             th:text="${#strings.toUpperCase(#strings.length(community.name()) > 1 ? #strings.substring(community.name(), 0, 2) : community.name())}">
+            CS
+        </div>
+
+    </th:block>
+
+    <div class="comm-info">
+        <strong>d/<span th:text="${community.name()}">NombreComunidad</span></strong>
+    </div>
+</li>

@@ -75,11 +75,12 @@ public class ThreadServiceProxy {
     public List<ThreadDTO> getThreadsWithPrompt(String query) {
         try {
             ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
-                    serverApiUrl + "/api/threads/search?q=" + query,
+                    serverApiUrl + "/api/threads/search?query=" + query,
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<>() {}
             );
+            System.out.println(response.getBody());
             return response.getBody() != null ? response.getBody() : Collections.emptyList();
         } catch (Exception e) {
             return Collections.emptyList();

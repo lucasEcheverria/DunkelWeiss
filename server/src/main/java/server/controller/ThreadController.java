@@ -124,8 +124,8 @@ public class ThreadController {
     @GetMapping("/search")
     public ResponseEntity<List<ThreadDTO>> getThreadsWithPrompt(
             @Parameter(description = "Texto a buscar en título", example = "IDE", required = true)
-            @RequestParam String q) {
-        List<Thread> threads = threadService.getThreadsWithPrompt(q);
+            @RequestParam String query) {
+        List<Thread> threads = threadService.getThreadsWithPrompt(query);
         List<ThreadDTO> result = threads.stream()
                 .map(thread -> new ThreadDTO(
                         thread.getId(),
