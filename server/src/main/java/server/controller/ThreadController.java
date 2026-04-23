@@ -212,4 +212,43 @@ public class ThreadController {
     public ResponseEntity<List<ThreadSummaryDTO>> getThreadFeed() {
         return ResponseEntity.ok(threadService.getInitialFeed());
     }
+
+    @Operation(
+            summary = "Obtener hilos favoritos del usuario autenticado",
+            description = "Devuelve la lista de hilos que el usuario ha marcado como favoritos. Requiere token de sesión."
+    )
+    @GetMapping("/favorites")
+    public ResponseEntity<?> getFavoriteThreads(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+        User user = authService.getUserByToken(token);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<Thread> threads = threadService.getFavoriteThreads(user);
+        List<ThreadDTO> result = threads.stream()
+                .map(thread -> new ThreadDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null,
+                        thread.getCommunity() != null ? thread.getCommunity().getName() : null
+                ))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
 }

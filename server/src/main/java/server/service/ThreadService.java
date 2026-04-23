@@ -64,7 +64,15 @@ public class ThreadService {
         return threadRepository.findByOwnerEmail(email);
     }
 
+    // Devuelve la lista de hilos marcados como favoritos por el usuario.
+    public List<Thread> getFavoriteThreads(User user) {
+        User u = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User no encontrado: " + user.getId()));
+        List<Thread> favs = u.getFavoriteThreads();
+        return favs == null ? List.of() : favs;
+    }
 
+    
     private ThreadDTO toDto(Thread hilo) {
         return new ThreadDTO(
                 hilo.getId(),
