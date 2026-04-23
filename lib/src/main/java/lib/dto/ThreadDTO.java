@@ -11,6 +11,6 @@ public record ThreadDTO(
         String  description,
         @JsonProperty("ownerUsername")
         String  ownerUsername,
-        @JsonProperty("comunidadNombre")
-        String  comunidadNombre
+        @JsonProperty("communityId")
+        String communityId
 ) {}
