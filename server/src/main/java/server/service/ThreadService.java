@@ -29,7 +29,7 @@ public class ThreadService {
         this.communityRepository = communityRepository;
     }
 
-    public ThreadDTO createHilo(CreateThreadDTO dto, User owner) {
+    public ThreadDTO createThread(CreateThreadDTO dto, User owner) {
         Community community = communityRepository.findById(dto.communityId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Community no encontrada: " + dto.communityId()));
@@ -44,7 +44,7 @@ public class ThreadService {
         return toDto(saved);
     }
 
-    public ThreadDTO getHilo(Integer id) {
+    public ThreadDTO getThread(Integer id) {
         Thread hilo = threadRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Thread no encontrado: " + id));
