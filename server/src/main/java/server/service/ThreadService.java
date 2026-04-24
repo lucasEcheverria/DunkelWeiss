@@ -72,7 +72,7 @@ public class ThreadService {
 
         Thread hilo = threadRepository.findById(threadId)
                 .orElseThrow(() -> new IllegalArgumentException("Thread no encontrado: " + threadId));
-
+        
         List<Thread> favs = u.getFavoriteThreads();
         if (favs == null) favs = new ArrayList<>();
 
