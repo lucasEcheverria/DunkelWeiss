@@ -212,4 +212,125 @@ public class ThreadController {
     public ResponseEntity<List<ThreadSummaryDTO>> getThreadFeed() {
         return ResponseEntity.ok(threadService.getInitialFeed());
     }
+
+    @Operation(
+            summary = "Obtener hilos favoritos del usuario autenticado",
+            description = "Devuelve la lista de hilos que el usuario ha marcado como favoritos. Requiere token de sesión."
+    )
+    @GetMapping("/favorites")
+    public ResponseEntity<?> getFavoriteThreads(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+        User user = authService.getUserByToken(token);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        List<Thread> threads = threadService.getFavoriteThreads(user);
+        List<ThreadDTO> result = threads.stream()
+                .map(thread -> new ThreadDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null,
+                        thread.getCommunity() != null ? thread.getCommunity().getName() : null
+                ))
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
+    
+    @Operation(
+            summary = "Añadir un hilo a favoritos",
+            description = "Marca un hilo como favorito para el usuario autenticado. Requiere token de sesión."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Hilo añadido a favoritos"),
+            @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autenticado: falta el token o no tiene formato Bearer"),
+            @ApiResponse(responseCode = "403", description = "Token inválido o sesión expirada")
+    })
+    @PostMapping("/favorites/{id}")
+    public ResponseEntity<?> addFavorite(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @Parameter(description = "ID del hilo a añadir a favoritos", required = true)
+            @PathVariable Integer id) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+        User user = authService.getUserByToken(token);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            threadService.addFavoriteThread(user, id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+    
+    @Operation(
+            summary = "Quitar un hilo de favoritos",
+            description = "Quita un hilo de la lista de favoritos del usuario autenticado. Requiere token de sesión."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Hilo eliminado de favoritos"),
+            @ApiResponse(responseCode = "400", description = "El hilo no está en favoritos o solicitud inválida"),
+            @ApiResponse(responseCode = "401", description = "No autenticado: falta el token o no tiene formato Bearer"),
+            @ApiResponse(responseCode = "403", description = "Token inválido o sesión expirada")
+    })
+    @DeleteMapping("/favorites/{id}")
+    public ResponseEntity<?> removeFavorite(
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = io.swagger.v3.oas.annotations.enums.ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @Parameter(description = "ID del hilo a quitar de favoritos", required = true)
+            @PathVariable Integer id) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+        User user = authService.getUserByToken(token);
+
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        try {
+            threadService.removeFavoriteThread(user, id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

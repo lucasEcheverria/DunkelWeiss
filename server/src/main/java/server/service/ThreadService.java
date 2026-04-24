@@ -12,6 +12,7 @@ import server.entity.Thread;
 import server.entity.User;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class ThreadService {
@@ -63,8 +64,53 @@ public class ThreadService {
     public List<Thread> getThreadsFromUser(String email) {
         return threadRepository.findByOwnerEmail(email);
     }
+    
+    // Añade un hilo a la lista de favoritos del usuario autenticado.
+    public void addFavoriteThread(User user, Integer threadId) {
+        User u = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User no encontrado: " + user.getId()));
 
+        Thread hilo = threadRepository.findById(threadId)
+                .orElseThrow(() -> new IllegalArgumentException("Thread no encontrado: " + threadId));
+        
+        List<Thread> favs = u.getFavoriteThreads();
+        if (favs == null) favs = new ArrayList<>();
 
+        // Evita duplicados
+        if (favs.stream().noneMatch(t -> t.getId().equals(threadId))) {
+            favs.add(hilo);
+            u.setFavoriteThreads(favs);
+            userRepository.save(u);
+        }
+    }
+
+    // Quita un hilo de la lista de favoritos del usuario autenticado.
+    public void removeFavoriteThread(User user, Integer threadId) {
+        User u = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User no encontrado: " + user.getId()));
+
+        @SuppressWarnings("unused")
+		Thread hilo = threadRepository.findById(threadId)
+                .orElseThrow(() -> new IllegalArgumentException("Thread no encontrado: " + threadId));
+
+        List<Thread> favs = u.getFavoriteThreads();
+        if (favs == null || favs.stream().noneMatch(t -> t.getId().equals(threadId))) {
+            throw new IllegalArgumentException("El hilo no está en favoritos: " + threadId);
+        }
+
+        favs.removeIf(t -> t.getId().equals(threadId));
+        u.setFavoriteThreads(favs);
+        userRepository.save(u);
+    }
+    
+    // Devuelve la lista de hilos marcados como favoritos por el usuario.
+    public List<Thread> getFavoriteThreads(User user) {
+        User u = userRepository.findById(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("User no encontrado: " + user.getId()));
+        List<Thread> favs = u.getFavoriteThreads();
+        return favs == null ? List.of() : favs;
+    }
+    
     private ThreadDTO toDto(Thread hilo) {
         return new ThreadDTO(
                 hilo.getId(),
