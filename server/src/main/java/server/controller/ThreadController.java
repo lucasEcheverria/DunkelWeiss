@@ -115,7 +115,7 @@ public class ThreadController {
         }
 
         try {
-            ThreadDTO created = threadService.createHilo(dto, user);
+            ThreadDTO created = threadService.createThread(dto, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -183,7 +183,7 @@ public class ThreadController {
             @PathVariable Integer id
     ) {
         try {
-            ThreadDTO hilo = threadService.getHilo(id);
+            ThreadDTO hilo = threadService.getThread(id);
             return ResponseEntity.ok(hilo);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

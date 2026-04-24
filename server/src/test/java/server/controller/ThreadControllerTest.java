@@ -62,7 +62,7 @@ class ThreadControllerTest {
             ThreadDTO threadDTO = new ThreadDTO(1, "title", "desc", "nickname", "community");
 
             when(authService.getUserByToken(token)).thenReturn(user);
-            when(threadService.createHilo(any(CreateThreadDTO.class), any(User.class))).thenReturn(threadDTO);
+            when(threadService.createThread(any(CreateThreadDTO.class), any(User.class))).thenReturn(threadDTO);
 
             mockMvc.perform(post("/api/threads/create")
                             .header("Authorization", bearerToken)
@@ -114,7 +114,7 @@ class ThreadControllerTest {
             CreateThreadDTO dto = new CreateThreadDTO("title", "desc", 99);
 
             when(authService.getUserByToken(token)).thenReturn(user);
-            when(threadService.createHilo(any(CreateThreadDTO.class), any(User.class)))
+            when(threadService.createThread(any(CreateThreadDTO.class), any(User.class)))
                     .thenThrow(new IllegalArgumentException("Community no encontrada: 99"));
 
             mockMvc.perform(post("/api/threads/create")
@@ -137,7 +137,7 @@ class ThreadControllerTest {
         void withExistingId_ReturnsOkAndBody() throws Exception {
             ThreadDTO threadDTO = new ThreadDTO(1, "title", "desc", "nickname", "community");
 
-            when(threadService.getHilo(1)).thenReturn(threadDTO);
+            when(threadService.getThread(1)).thenReturn(threadDTO);
 
             mockMvc.perform(get("/api/threads/get/1"))
                     .andExpect(status().isOk())
@@ -150,7 +150,7 @@ class ThreadControllerTest {
 
         @Test
         void withNonExistentId_ReturnsNotFound() throws Exception {
-            when(threadService.getHilo(99))
+            when(threadService.getThread(99))
                     .thenThrow(new IllegalArgumentException("Thread no encontrado: 99"));
 
             mockMvc.perform(get("/api/threads/get/99"))
