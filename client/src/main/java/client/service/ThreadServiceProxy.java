@@ -114,4 +114,67 @@ public class ThreadServiceProxy {
             return Collections.emptyList();
         }
     }
+
+    // Obtener hilos favoritos del usuario autenticado
+    public List<ThreadDTO> getFavoriteThreads() {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            String token = authService.getToken();
+            if (token == null) return Collections.emptyList();
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            ResponseEntity<List<ThreadDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/favorites",
+                    HttpMethod.GET,
+                    request,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
+    // Añadir a favoritos
+    public boolean addFavorite(Integer threadId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            String token = authService.getToken();
+            if (token == null) return false;
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/favorites/" + threadId,
+                    HttpMethod.POST,
+                    request,
+                    Void.class
+            );
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Quitar de favoritos
+    public boolean removeFavorite(Integer threadId) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            String token = authService.getToken();
+            if (token == null) return false;
+            headers.setBearerAuth(token);
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            ResponseEntity<Void> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/favorites/" + threadId,
+                    HttpMethod.DELETE,
+                    request,
+                    Void.class
+            );
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

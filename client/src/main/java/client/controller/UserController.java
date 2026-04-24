@@ -3,9 +3,11 @@ package client.controller;
 import client.service.AuthServiceProxy;
 import client.service.UserServiceProxy;
 import client.service.CommunityServiceProxy;
+import client.service.ThreadServiceProxy;
 import lib.dto.UpdateUserDTO;
 import lib.dto.UserDTO;
 import lib.dto.CommunityDTO;
+import lib.dto.ThreadDTO;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +25,13 @@ public class UserController {
     private final AuthServiceProxy authService;
     private final UserServiceProxy userService;
     private final CommunityServiceProxy communityService;
+    private final ThreadServiceProxy threadService;
 
-    public UserController(AuthServiceProxy authService, UserServiceProxy userService, CommunityServiceProxy communityService) {
+    public UserController(AuthServiceProxy authService, UserServiceProxy userService, CommunityServiceProxy communityService, ThreadServiceProxy threadService) {
         this.authService = authService;
         this.userService = userService;
         this.communityService = communityService;
+        this.threadService = threadService;
     }
 
     @GetMapping("/profile")
@@ -43,12 +47,15 @@ public class UserController {
             return "redirect:/?error=true";
         }
 
-        // Añadimos las comunidades del usuario al modelo para que el template pueda renderizarlas
+        // Añadimos las comunidades y los hilos del usuario al modelo para que el template pueda renderizarlas
         List<CommunityDTO> communities = communityService.getMyCommunities(token);
+        List<ThreadDTO> createdThreads = threadService.getThreadsFromUser(user.getEmail());
+        List<ThreadDTO> favoriteThreads = threadService.getFavoriteThreads();
 
         model.addAttribute("user", user);
         model.addAttribute("communities", communities);
-        // pass the requested tab (may be null) so the template can decide which tab to show
+        model.addAttribute("createdThreads", createdThreads);
+        model.addAttribute("favoriteThreads", favoriteThreads);
         model.addAttribute("activeTab", tab);
         return "profile"; // Necesita template profile.html
     }
@@ -62,7 +69,6 @@ public class UserController {
         if (!ok) {
             return "redirect:/profile?error=true";
         }
-        // After leaving, redirect to profile and show the communities tab so the user can see the updated list
         return "redirect:/profile?tab=communities";
     }
 
@@ -83,5 +89,29 @@ public class UserController {
         }
 
         return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/favorite")
+    public String favoriteThread(@RequestParam("threadId") Integer threadId) {
+        String token = authService.getToken();
+        if (token == null) return "redirect:/";
+
+        boolean ok = threadService.addFavorite(threadId);
+        if (!ok) {
+            return "redirect:/profile?tab=threads&error=true";
+        }
+        return "redirect:/profile?tab=threads";
+    }
+
+    @PostMapping("/profile/unfavorite")
+    public String unfavoriteThread(@RequestParam("threadId") Integer threadId) {
+        String token = authService.getToken();
+        if (token == null) return "redirect:/";
+
+        boolean ok = threadService.removeFavorite(threadId);
+        if (!ok) {
+            return "redirect:/profile?tab=threads&error=true";
+        }
+        return "redirect:/profile?tab=threads";
     }
 }
