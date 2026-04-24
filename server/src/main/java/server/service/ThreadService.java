@@ -29,9 +29,9 @@ public class ThreadService {
     }
 
     public ThreadDTO createHilo(CreateThreadDTO dto, User owner) {
-        Community community = communityRepository.findById(dto.comunidadId())
+        Community community = communityRepository.findById(dto.communityId())
                 .orElseThrow(() -> new IllegalArgumentException(
-                        "Community no encontrada: " + dto.comunidadId()));
+                        "Community no encontrada: " + dto.communityId()));
 
         Thread hilo = new Thread();
         hilo.setTitle(dto.title());
