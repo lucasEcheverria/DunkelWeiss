@@ -6,223 +6,261 @@
     <title>Perfil - DunkelWeiss</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}" />
 
-    <!-- Pequeñas reglas locales para el layout de perfil -->
     <style>
-        .dunkel-widget { max-width: 920px; padding: 28px; }
-        .tabs { display:flex; gap:8px; margin-bottom:16px; }
-        .tabs .tab-btn {
+        /* Contenedor principal del perfil */
+        .profile-container {
+            max-width: 900px;
+            margin: 40px auto;
+            width: 100%;
+        }
+        
+        /* Cabecera de pestañas con estilo Dunkel */
+        .tabs-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
             background: transparent;
-            border: 1px solid rgba(0,0,0,0.06);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            font-size: 15px;
             font-weight: 600;
-        }
-        .tabs .tab-btn:focus { outline: none; box-shadow: none; }
-        .tabs .tab-btn.active {
-            background-color: #1a73e8;
-            color: #fff;
-            border-color: #1a73e8;
-        }
-        .tabs .tab-btn.inactive {
-            background: transparent;
-            color: inherit;
-        }
-
-        .row { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
-        label { font-size:0.95rem; color:#333; }
-        .label-white { color: #fff; }
-        .create-input {
-            width:100%;
-            padding:10px 12px;
-            border-radius:6px;
-            border:1px solid #ddd;
-            box-sizing: border-box;
-            font-size:0.95rem;
-        }
-        .create-input.readonly { background:#fafafa; }
-
-        .actions { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-
-        .error { color:#b00020; margin-bottom:12px; }
-
-        /* New styles for communities list (vertical, centered) */
-        .communities-list {
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            padding:8px 4px;
-            align-items:center;
-            width:100%;
-        }
-        .community-card {
-            width:90%;
-            max-width:720px;
-            background:#fff;
-            border:1px solid #e6e6e6;
-            border-radius:8px;
-            padding:12px 16px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
             cursor: pointer;
+            transition: 0.2s;
+            border-radius: 20px;
         }
-        .community-card h4 { margin:0 0 6px 0; font-size:1rem; }
-        .community-card p { margin:0; font-size:0.95rem; color:#555; }
-        .community-card .title { font-weight:700; }
-        .community-card .desc { color:#444; }
 
-        @media (max-width: 800px) {
-            .dunkel-widget { margin: 16px; padding: 18px; }
+        .tab-btn.active {
+            background-color: var(--brand-color);
+            color: white;
+        }
+
+        /* Mejora 1: Alineación perfecta de campos en 'Mis Datos' */
+        .grid-form-group {
+            display: grid;
+            grid-template-columns: 180px 1fr; /* Ancho fijo para etiquetas */
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .grid-form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left;
+        }
+
+        /* Mejora 2: Corrección del borde naranja en selección */
+        .selected-item {
+            border: 2px solid var(--brand-color) !important;
+            box-shadow: 0 0 8px rgba(255, 69, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Estilos generales para inputs */
+        .create-input.readonly {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .threads-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-form-group { grid-template-columns: 1fr; gap: 8px; }
+            .threads-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body>
-<div class="web-layout">
-    <main class="center-feed">
-        <div class="dunkel-widget" style="margin: 32px auto;" th:attr="data-active-tab=${activeTab}">
+<body class="dark-theme">
 
-            <!-- Tabs superior -->
-            <div class="tabs">
-                <button id="tab-data" class="tab-btn active" type="button" onclick="showTab('data')">Mis datos</button>
-                <button id="tab-communities" class="tab-btn inactive" type="button" onclick="showTab('communities')">Mis Comunidades</button>
+    <header class="dunkel-navbar">
+        <div class="navbar-content">
+            <div class="nav-left">
+                <div class="brand-container" onclick="window.location.href='/home'">
+                    <span class="brand-logo">🕸️</span>
+                    <h1 class="brand-name">Dunkelweiss</h1>
+                </div>
             </div>
-
-            <!-- Contenedor de Mis Datos (visible por defecto) -->
-            <section id="section-data">
-
-                <div th:if="${param.error}">
-                    <div class="error">Ocurrió un error al procesar la solicitud.</div>
-                </div>
-
-                <div class="row">
-                    <label class="label-white">Email</label>
-                    <input type="text" th:value="${user.email}" class="create-input readonly" readonly style="background:#cccccc; color:#111;" />
-                </div>
-
-                <form action="/profile/update" method="post">
-                    <div class="row">
-                        <label class="label-white">Nickname</label>
-                        <input type="text" name="nickname" th:value="${user.username}" class="create-input" />
-                    </div>
-
-                    <div class="row">
-                        <label class="label-white">Nueva contraseña</label>
-                        <input type="password" name="password" placeholder="" class="create-input" />
-                    </div>
-
-                    <div class="actions" style="margin-top:8px;">
-                        <div class="muted">ID: <span th:text="${user.id}"></span></div>
-                        <button type="submit" class="btn">Guardar</button>
-                    </div>
-                </form>
-
-            </section>
-
-            <!-- Contenedor de Comunidades -->
-            <section id="section-communities" style="display:none;">
-                <div th:if="${communities == null || #lists.isEmpty(communities)}">
-                    <p class="muted">Aún no has creado ninguna comunidad.</p>
-                </div>
-
-                <div th:if="${communities != null and !#lists.isEmpty(communities)}">
-                    <div class="communities-list">
-                        <div th:each="c : ${communities}" class="community-card" th:attr="data-id=${c.id}" th:onclick="|selectCommunity(this, ${c.id})|">
-                            <h4 class="title" th:text="${c.name}">Nombre comunidad</h4>
-                            <p class="desc" th:text="${c.description}" style="display:none; margin-top:8px;">Descripción de la comunidad</p>
-                        </div>
-                    </div>
-
-                    <!-- Form para seleccionar comunidades -->
-                    <form id="leaveForm" action="/profile/leaveCommunity" method="post" style="margin-top:12px; display:flex; gap:8px; align-items:center; justify-content:center;">
-                        <input type="hidden" name="communityId" id="selectedCommunityId" />
-                        <button id="leaveBtn" type="submit" class="btn btn-danger" disabled>Dejar de seguir</button>
-                    </form>
-                 </div>
-              </section>
-
-            <div style="margin-top:16px; text-align:right;">
-                <a th:href="@{/home}" class="btn btn-outline">Volver</a>
+            <div class="nav-right">
+                <a th:href="@{/home}" class="btn btn-outline" style="text-decoration: none;">Volver al inicio</a>
             </div>
         </div>
-    </main>
-</div>
+    </header>
 
-<script>
-    // Inicializa la pestaña por defecto (mis datos)
-    function showTab(name) {
-        const data = document.getElementById('section-data');
-        const communities = document.getElementById('section-communities');
-        const tabData = document.getElementById('tab-data');
-        const tabCommunities = document.getElementById('tab-communities');
+    <div class="web-layout">
+        <main class="center-feed" id="profile-root" th:attr="data-active-tab=${activeTab}">
+            <div class="profile-container">
+                
+                <div class="tabs-header">
+                    <button id="tab-data" class="tab-btn" onclick="showTab('data')">Mis Datos</button>
+                    <button id="tab-communities" class="tab-btn" onclick="showTab('communities')">Mis Comunidades</button>
+                    <button id="tab-threads" class="tab-btn" onclick="showTab('threads')">Mis Hilos</button>
+                </div>
 
-        if (name === 'data') {
-            data.style.display = '';
-            communities.style.display = 'none';
-            tabData.classList.add('active');
-            tabData.classList.remove('inactive');
-            tabCommunities.classList.remove('active');
-            tabCommunities.classList.add('inactive');
-        } else {
-            data.style.display = 'none';
-            communities.style.display = '';
-            tabData.classList.remove('active');
-            tabData.classList.add('inactive');
-            tabCommunities.classList.add('active');
-            tabCommunities.classList.remove('inactive');
+                <section id="section-data" class="form-card" style="display:none;">
+                    <h2 class="widget-header-text" style="margin-bottom: 24px;">Configuración de Cuenta</h2>
+                    
+                    <div class="grid-form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="text" th:value="${user.email}" class="create-input readonly" readonly />
+                    </div>
+
+                    <form th:action="@{/profile/update}" method="post">
+                        <input type="hidden" name="activeTab" value="data" />
+                        
+                        <div class="grid-form-group">
+                            <label for="nickname">Nickname</label>
+                            <input type="text" id="nickname" name="nickname" th:value="${user.username}" class="create-input" required />
+                        </div>
+
+                        <div class="grid-form-group">
+                            <label for="password">Nueva Contraseña</label>
+                            <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar" class="create-input" />
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                            <span class="thread-id">UID: <span th:text="${user.id}">0</span></span>
+                            <button type="submit" class="btn" style="background-color: var(--brand-color); color: white; padding: 10px 30px;">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section id="section-communities" style="display:none;">
+                    <div class="form-card">
+                        <h2 class="widget-header-text">Comunidades que sigues</h2>
+                        
+                        <ul class="community-list" style="margin-top: 20px;">
+                            <li th:each="c : ${communities}" 
+                                class="community-item" 
+                                style="border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; transition: 0.2s;"
+                                th:onclick="|selectCommunity(this, ${c.id})|">
+                                
+                                <div style="padding: 16px; display: flex; align-items: center; gap: 15px;">
+                                    <div class="comm-avatar" 
+                                         th:with="colors=${ {'#ff9f43', '#00b894', '#0984e3', '#e84393', '#6c5ce7', '#d63031', '#fdcb6e'} }, colorIndex=${c.id % 7}"
+                                         th:style="'background-color: ' + ${colors[colorIndex]} + '; color: white; min-width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;'"
+                                         th:text="${#strings.toUpperCase(#strings.length(c.name) > 1 ? #strings.substring(c.name, 0, 2) : c.name)}">
+                                    </div>
+                                    <div class="comm-info">
+                                        <strong style="color: var(--text-primary); font-size: 16px;">d/<span th:text="${c.name}">Nombre</span></strong>
+                                        <p class="desc-text" th:text="${c.description}" style="display:none; font-size: 13px; color: var(--text-secondary); margin-top: 6px;"></p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <form id="leaveForm" th:action="@{/profile/leaveCommunity}" method="post" style="margin-top: 20px; text-align: center;">
+                            <input type="hidden" name="activeTab" value="communities" />
+                            <input type="hidden" name="communityId" id="selectedCommunityId" />
+                            <button id="leaveBtn" type="submit" class="btn btn-outline" disabled style="border-color: #ff5252; color: #ff5252;">Dejar de seguir</button>
+                        </form>
+                    </div>
+                </section>
+
+                <section id="section-threads" style="display:none;">
+                    <div class="threads-grid">
+                        <div class="threads-column">
+                            <h2 class="widget-header-text">Favoritos</h2>
+                            <div th:each="t : ${favoriteThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, ${t.id}, 'fav')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                                <div style="padding: 12px;">
+                                    <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
+                                    <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
+                                </div>
+                            </div>
+                            <form th:action="@{/profile/unfavorite}" method="post">
+                                <input type="hidden" name="activeTab" value="threads" />
+                                <input type="hidden" name="threadId" id="selectedFavThreadId" />
+                                <button id="unfavBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Quitar Favorito</button>
+                            </form>
+                        </div>
+
+                        <div class="threads-column">
+                            <h2 class="widget-header-text">Tus Hilos</h2>
+                            <div th:each="t : ${createdThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, ${t.id}, 'own')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                                <div style="padding: 12px;">
+                                    <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
+                                    <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
+                                </div>
+                            </div>
+                            <form th:action="@{/profile/favorite}" method="post">
+                                <input type="hidden" name="activeTab" value="threads" />
+                                <input type="hidden" name="threadId" id="selectedOwnThreadId" />
+                                <button id="favBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Hacer Favorito</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function showTab(name) {
+            const sections = ['data', 'communities', 'threads'];
+            sections.forEach(s => {
+                const el = document.getElementById('section-' + s);
+                const btn = document.getElementById('tab-' + s);
+                if (s === name) {
+                    el.style.display = 'block';
+                    btn.classList.add('active');
+                } else {
+                    el.style.display = 'none';
+                    btn.classList.remove('active');
+                }
+            });
         }
-    }
 
-    // Stilo para la comunidad seleccionada
-    const SELECTED_CLASS = 'selected-community';
+        function selectCommunity(element, id) {
+            const alreadySelected = element.classList.contains('selected-item');
+            
+            document.querySelectorAll('.community-item').forEach(el => {
+                el.classList.remove('selected-item');
+                el.querySelector('.desc-text').style.display = 'none';
+            });
 
-    function selectCommunity(element, id) {
-        // Seleccionamos o deseleccionamos la comunidad clickeada
-        const already = element.classList.contains(SELECTED_CLASS);
+            const input = document.getElementById('selectedCommunityId');
+            const btn = document.getElementById('leaveBtn');
 
-        // Limipiamos cualquier selección previa
-        document.querySelectorAll('.community-card').forEach(el => {
-            el.classList.remove(SELECTED_CLASS);
-            const d = el.querySelector('.desc'); if (d) d.style.display = 'none';
+            if (!alreadySelected) {
+                element.classList.add('selected-item');
+                element.querySelector('.desc-text').style.display = 'block';
+                input.value = id;
+                btn.disabled = false;
+            } else {
+                input.value = '';
+                btn.disabled = true;
+            }
+        }
+
+        function selectThread(element, id, type) {
+            const container = element.parentElement;
+            container.querySelectorAll('.dunkel-thread-box').forEach(el => el.classList.remove('selected-item'));
+            
+            const inputId = type === 'fav' ? 'selectedFavThreadId' : 'selectedOwnThreadId';
+            const btnId = type === 'fav' ? 'unfavBtn' : 'favBtn';
+            
+            element.classList.add('selected-item');
+            document.getElementById(inputId).value = id;
+            document.getElementById(btnId).disabled = false;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const root = document.getElementById('profile-root');
+            const active = root.getAttribute('data-active-tab') || 'data';
+            showTab(active);
         });
-
-        const input = document.getElementById('selectedCommunityId');
-        const btn = document.getElementById('leaveBtn');
-
-        if (already) {
-            if (input) input.value = '';
-            if (btn) btn.disabled = true;
-            return;
-        }
-
-        // Remarcamos la comunidad seleccionada y mostramos su descripción
-        element.classList.add(SELECTED_CLASS);
-        if (input) input.value = id;
-        if (btn) btn.disabled = false;
-        const desc = element.querySelector('.desc');
-        if (desc) desc.style.display = 'block';
-    }
-
-    // Estilos para la comunidad seleccionada y el botón de dejar comunidad
-    (function addSelectedStyle() {
-        const style = document.createElement('style');
-        style.innerHTML = `
-            .selected-community { outline: 2px solid #1a73e8; transform: translateY(-2px); }
-            .btn-danger { background:#b00020; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-            .btn-danger[disabled] { opacity:0.6; cursor:not-allowed; }
-        `;
-        document.head.appendChild(style);
-    })();
-
-    // Poner la pestaña activa según el atributo data-active-tab del contenedor
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            const root = document.querySelector('.dunkel-widget');
-            const active = root ? root.dataset.activeTab : null;
-            if (active === 'communities') showTab('communities');
-            else showTab('data');
-        } catch (e) {
-            showTab('data');
-        }
-    });
-</script>
+    </script>
 </body>
 </html>
