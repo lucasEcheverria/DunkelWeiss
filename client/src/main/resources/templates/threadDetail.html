@@ -145,33 +145,32 @@
             <div class="post-card-content" th:utext="${post.content}">Contenido</div>
         </div>
 
-        <div class="post-card-footer">
-			<div class="post-collapse-area">
-			    <button class="post-action-btn collapse-toggle" type="button"
-			            th:if="${post.replies != null and #lists.size(post.replies) > 0}"
-			            th:attr="data-target='replies-' + ${post.id}">▸</button>
-			    
-			    <span class="reply-count-badge" 
-			          th:if="${post.replies != null and #lists.size(post.replies) > 0}" 
-			          th:text="${#lists.size(post.replies)}">0</span>
-			</div>
+		<div class="post-card-footer">
+            <div class="post-collapse-area">
+                <button class="post-action-btn collapse-toggle" type="button"
+                        th:if="${post.replies != null and #lists.size(post.replies) > 0}"
+                        th:attr="data-target='replies-' + ${post.id}">▸</button>
+                
+                <span class="reply-count-badge" th:if="${post.replies != null and #lists.size(post.replies) > 0}" th:text="${#lists.size(post.replies)}">0</span>
+            </div>
             <button class="post-action-btn reply-toggle" type="button" th:attr="data-target='reply-form-' + ${post.id}">💬 Responder</button>
             <button type="button" class="post-vote-btn like">👍 <span class="post-vote-count" th:text="${post.likes}">0</span></button>
             <button type="button" class="post-vote-btn dislike">👎 <span class="post-vote-count" th:text="${post.dislikes}">0</span></button>
         </div>
 
+        <div class="reply-form" th:id="${'reply-form-' + post.id}">
+            <form th:action="@{/posts/create}" method="post">
+                <input type="hidden" name="threadId" th:value="${post.threadId}" />
+                <input type="hidden" name="parentId" th:value="${post.id}" />
+                <textarea name="content" placeholder="Escribe tu respuesta..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn-cancel cancel-reply" type="button" th:attr="data-target='reply-form-' + ${post.id}">Cancelar</button>
+                    <button class="btn-reply-submit" type="submit">Responder</button>
+                </div>
+            </form>
+        </div>
+
         <div class="replies-container collapsed" th:id="${'replies-' + post.id}">
-            <div class="reply-form" th:id="${'reply-form-' + post.id}">
-                <form th:action="@{/posts/create}" method="post">
-                    <input type="hidden" name="threadId" th:value="${post.threadId}" />
-                    <input type="hidden" name="parentId" th:value="${post.id}" />
-                    <textarea name="content" placeholder="Escribe tu respuesta..."></textarea>
-                    <div class="reply-form-actions">
-                        <button class="btn-cancel cancel-reply" type="button" th:attr="data-target='reply-form-' + ${post.id}">Cancelar</button>
-                        <button class="btn-reply-submit" type="submit">Responder</button>
-                    </div>
-                </form>
-            </div>
             <div th:each="reply : ${post.replies}" th:if="${reply != null}">
                 <div th:insert="~{::postCard(post=${reply})}"></div>
             </div>
