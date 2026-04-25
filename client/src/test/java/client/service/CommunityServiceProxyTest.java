@@ -3,6 +3,7 @@ package client.service;
 import lib.dto.CommunityDTO;
 import lib.dto.CreateCommunityDTO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -32,157 +33,176 @@ class CommunityServiceProxyTest {
 
     @BeforeEach
     void setUp() {
-        // Construcción manual para inyectar la URL como si fuera @Value
         proxy = new CommunityServiceProxy(restTemplate, SERVER_URL);
     }
 
-    @Test
-    void getAll_returnsList_whenServerRespondsSuccessfully() {
-        List<CommunityDTO> communities = List.of(new CommunityDTO(1, "Tech", "desc"));
+    @Nested
+    class GetAll {
 
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities"),
-                eq(HttpMethod.GET),
-                isNull(),
-                any(ParameterizedTypeReference.class)
-        )).thenReturn(ResponseEntity.ok(communities));
+        @Test
+        void returnsList_whenServerRespondsSuccessfully() {
+            List<CommunityDTO> communities = List.of(new CommunityDTO(1, "Tech", "desc"));
 
-        assertThat(proxy.getAll()).isEqualTo(communities);
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(communities));
+
+            assertThat(proxy.getAll()).isEqualTo(communities);
+        }
+
+        @Test
+        void returnsEmptyList_whenServerThrowsException() {
+            when(restTemplate.exchange(
+                    any(String.class), any(), any(), any(ParameterizedTypeReference.class)
+            )).thenThrow(new RuntimeException("connection refused"));
+
+            assertThat(proxy.getAll()).isEmpty();
+        }
+
+        @Test
+        void returnsEmptyList_whenServerReturnsNullBody() {
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(null));
+
+            assertThat(proxy.getAll()).isEmpty();
+        }
     }
 
-    @Test
-    void getAll_returnsEmptyList_whenServerThrowsException() {
-        when(restTemplate.exchange(
-                any(String.class), any(), any(), any(ParameterizedTypeReference.class)
-        )).thenThrow(new RuntimeException("connection refused"));
+    @Nested
+    class CreateCommunity {
 
-        assertThat(proxy.getAll()).isEmpty();
+        @Test
+        void returnsDTO_whenServerRespondsSuccessfully() {
+            CommunityDTO dto = new CommunityDTO(1, "Gaming", null);
+
+            when(restTemplate.postForEntity(
+                    eq(SERVER_URL + "/api/communities/create"),
+                    any(HttpEntity.class),
+                    eq(CommunityDTO.class)
+            )).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(dto));
+
+            CommunityDTO result = proxy.createCommunity(new CreateCommunityDTO("Gaming", null), "tok");
+
+            assertThat(result).isEqualTo(dto);
+        }
+
+        @Test
+        void returnsNull_whenServerThrowsException() {
+            when(restTemplate.postForEntity(
+                    any(String.class), any(), eq(CommunityDTO.class)
+            )).thenThrow(new RuntimeException("error"));
+
+            assertThat(proxy.createCommunity(new CreateCommunityDTO("Gaming", null), "tok")).isNull();
+        }
     }
 
-    @Test
-    void getAll_returnsEmptyList_whenServerReturnsNullBody() {
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities"),
-                eq(HttpMethod.GET),
-                isNull(),
-                any(ParameterizedTypeReference.class)
-        )).thenReturn(ResponseEntity.ok(null));
+    @Nested
+    class GetTop5 {
 
-        assertThat(proxy.getAll()).isEmpty();
+        @Test
+        void returnsList_whenServerRespondsSuccessfully() {
+            List<CommunityDTO> top5 = List.of(new CommunityDTO(1, "Popular", null));
+
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities/top5"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(top5));
+
+            assertThat(proxy.getTop5()).isEqualTo(top5);
+        }
+
+        @Test
+        void returnsEmptyList_whenServerThrowsException() {
+            when(restTemplate.exchange(
+                    any(String.class), any(), any(), any(ParameterizedTypeReference.class)
+            )).thenThrow(new RuntimeException());
+
+            assertThat(proxy.getTop5()).isEmpty();
+        }
     }
 
-    @Test
-    void createCommunity_returnsDTO_whenServerRespondsSuccessfully() {
-        CommunityDTO dto = new CommunityDTO(1, "Gaming", null);
+    @Nested
+    class GetMyCommunities {
 
-        when(restTemplate.postForEntity(
-                eq(SERVER_URL + "/api/communities/create"),
-                any(HttpEntity.class),
-                eq(CommunityDTO.class)
-        )).thenReturn(ResponseEntity.status(HttpStatus.CREATED).body(dto));
+        @Test
+        void returnsList_whenServerRespondsSuccessfully() {
+            List<CommunityDTO> list = List.of(new CommunityDTO(2, "Sports", "sport"));
 
-        CommunityDTO result = proxy.createCommunity(new CreateCommunityDTO("Gaming", null), "tok");
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities/my_communities"),
+                    eq(HttpMethod.GET),
+                    any(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(list));
 
-        assertThat(result).isEqualTo(dto);
+            assertThat(proxy.getMyCommunities("tok")).isEqualTo(list);
+        }
+
+        @Test
+        void returnsEmptyList_whenServerThrowsException() {
+            when(restTemplate.exchange(
+                    any(String.class), any(), any(), any(ParameterizedTypeReference.class)
+            )).thenThrow(new RuntimeException());
+
+            assertThat(proxy.getMyCommunities("tok")).isEmpty();
+        }
+
+        @Test
+        void returnsEmptyList_whenServerReturnsNullBody() {
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities/my_communities"),
+                    eq(HttpMethod.GET),
+                    any(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(null));
+
+            assertThat(proxy.getMyCommunities("tok")).isEmpty();
+        }
     }
 
-    @Test
-    void createCommunity_returnsNull_whenServerThrowsException() {
-        when(restTemplate.postForEntity(
-                any(String.class), any(), eq(CommunityDTO.class)
-        )).thenThrow(new RuntimeException("error"));
+    @Nested
+    class LeaveCommunity {
 
-        assertThat(proxy.createCommunity(new CreateCommunityDTO("Gaming", null), "tok")).isNull();
-    }
+        @Test
+        void returnsTrue_whenServerResponds2xx() {
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities/leave/5"),
+                    eq(HttpMethod.POST),
+                    any(HttpEntity.class),
+                    eq(Void.class)
+            )).thenReturn(ResponseEntity.ok().build());
 
-    @Test
-    void getTop5_returnsList_whenServerRespondsSuccessfully() {
-        List<CommunityDTO> top5 = List.of(new CommunityDTO(1, "Popular", null));
+            assertThat(proxy.leaveCommunity("tok", 5)).isTrue();
+        }
 
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities/top5"),
-                eq(HttpMethod.GET),
-                isNull(),
-                any(ParameterizedTypeReference.class)
-        )).thenReturn(ResponseEntity.ok(top5));
+        @Test
+        void returnsFalse_whenServerThrowsException() {
+            when(restTemplate.exchange(
+                    any(String.class), any(), any(), eq(Void.class)
+            )).thenThrow(new RuntimeException("error"));
 
-        assertThat(proxy.getTop5()).isEqualTo(top5);
-    }
+            assertThat(proxy.leaveCommunity("tok", 5)).isFalse();
+        }
 
-    @Test
-    void getTop5_returnsEmptyList_whenServerThrowsException() {
-        when(restTemplate.exchange(
-                any(String.class), any(), any(), any(ParameterizedTypeReference.class)
-        )).thenThrow(new RuntimeException());
+        @Test
+        void returnsFalse_whenServerRespondsWithError() {
+            when(restTemplate.exchange(
+                    eq(SERVER_URL + "/api/communities/leave/5"),
+                    eq(HttpMethod.POST),
+                    any(HttpEntity.class),
+                    eq(Void.class)
+            )).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
 
-        assertThat(proxy.getTop5()).isEmpty();
-    }
-
-    @Test
-    void getMyCommunities_returnsList_whenServerRespondsSuccessfully() {
-        List<CommunityDTO> list = List.of(new CommunityDTO(2, "Sports", "sport"));
-
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities/my_communities"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                any(ParameterizedTypeReference.class)
-        )).thenReturn(ResponseEntity.ok(list));
-
-        assertThat(proxy.getMyCommunities("tok")).isEqualTo(list);
-    }
-
-    @Test
-    void getMyCommunities_returnsEmptyList_whenServerThrowsException() {
-        when(restTemplate.exchange(
-                any(String.class), any(), any(), any(ParameterizedTypeReference.class)
-        )).thenThrow(new RuntimeException());
-
-        assertThat(proxy.getMyCommunities("tok")).isEmpty();
-    }
-
-    @Test
-    void getMyCommunities_returnsEmptyList_whenServerReturnsNullBody() {
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities/my_communities"),
-                eq(HttpMethod.GET),
-                any(HttpEntity.class),
-                any(ParameterizedTypeReference.class)
-        )).thenReturn(ResponseEntity.ok(null));
-
-        assertThat(proxy.getMyCommunities("tok")).isEmpty();
-    }
-
-    @Test
-    void leaveCommunity_returnsTrue_whenServerResponds2xx() {
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities/leave/5"),
-                eq(HttpMethod.POST),
-                any(HttpEntity.class),
-                eq(Void.class)
-        )).thenReturn(ResponseEntity.ok().build());
-
-        assertThat(proxy.leaveCommunity("tok", 5)).isTrue();
-    }
-
-    @Test
-    void leaveCommunity_returnsFalse_whenServerThrowsException() {
-        when(restTemplate.exchange(
-                any(String.class), any(), any(), eq(Void.class)
-        )).thenThrow(new RuntimeException("error"));
-
-        assertThat(proxy.leaveCommunity("tok", 5)).isFalse();
-    }
-
-    @Test
-    void leaveCommunity_returnsFalse_whenServerRespondsWithError() {
-        when(restTemplate.exchange(
-                eq(SERVER_URL + "/api/communities/leave/5"),
-                eq(HttpMethod.POST),
-                any(HttpEntity.class),
-                eq(Void.class)
-        )).thenReturn(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-
-        assertThat(proxy.leaveCommunity("tok", 5)).isFalse();
+            assertThat(proxy.leaveCommunity("tok", 5)).isFalse();
+        }
     }
 }
