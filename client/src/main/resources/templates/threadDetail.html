@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dunkelweiss - Detalle del Hilo</title>
+    <link rel="stylesheet" href="../static/css/styles.css" th:href="@{/css/styles.css}">
+    <style>
+        /* Estilos funcionales para el colapsado (no afectan al layout global) */
+        .replies-container { overflow: hidden; transition: max-height 220ms ease, opacity 180ms ease; max-height: 9999px; }
+        .replies-container.collapsed { max-height: 0; opacity: 0; display: none; }
+        .post-collapse-area { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: 0.6rem; }
+        .reply-count-badge { background: #f1f1f1; border-radius: 999px; padding: 2px 6px; font-size: 0.85rem; color: #333; }
+        .reply-count-badge.hidden { display: none !important; }
+		.post-action-btn.collapse-toggle { 
+		    padding: 2px 8px; 
+		    cursor: pointer; 
+		    background: transparent; 
+		    border: none; 
+		    color: var(--text-primary); 
+		    font-size: 1.2rem;          
+		    font-weight: bold; 
+		    transition: transform 0.2s, color 0.2s;
+		    display: flex;
+		    align-items: center;
+		}
+		.post-action-btn.collapse-toggle:hover {
+		    color: var(--brand-color);  
+		    transform: scale(1.2);      
+		}
+    </style>
+</head>
+<body>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <button class="icon-btn-ghost">☰</button>
+            <div class="brand-container">
+                <span class="brand-logo">🕸️</span>
+                <a th:href="@{${@authServiceProxy.getToken() != null ? '/home' : '/auth'}}" style="text-decoration: none; color: inherit;">
+                    <h1 class="brand-name">Dunkelweiss</h1>
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-center">
+            <form th:action="@{/threads/search}" method="GET" class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="query" class="search-input" placeholder="Buscar hilos, comunidades o usuarios..." th:value="${param.query}">
+            </form>
+        </div>
+
+		<div class="nav-right">
+		    <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
+		    <a th:if="${@authServiceProxy.getToken() == null}" 
+		       th:href="@{/auth}" 
+		       class="btn btn-outline" 
+		       style="text-decoration: none; display: flex; align-items: center;">
+		        Log in
+		    </a>
+		    <a th:if="${@authServiceProxy.getToken() != null}" 
+		       th:href="@{/logout}" 
+		       class="btn btn-outline"
+		       style="text-decoration: none;">
+		        Logout
+		    </a>
+		    <a th:href="@{${@authServiceProxy.getToken() != null ? '/profile' : '/auth'}}" 
+		       class="nav-avatar" 
+		       style="text-decoration: none;">
+		        D
+		    </a>
+		</div>
+    </div>
+</header>
+
+<div class="web-layout">
+
+    <aside class="left-panel">
+        <nav class="side-menu">
+            <a th:href="@{/home}" class="menu-item"><span>↗️</span> Popular</a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/threads/new' : '/auth'}}" class="menu-item"><span>+</span> Crear Hilo</a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/communities/new' : '/auth'}}" class="menu-item"><span>🏘️</span> Crear Comunidad</a>
+            <a href="#" class="menu-item"><span>🧭</span> Explorar</a>
+        </nav>
+    </aside>
+
+    <main class="thread-main-column">
+        
+        <div class="thread-detail-header">
+            <div class="thread-detail-breadcrumb">
+                <a th:href="@{/home}">Inicio</a> <span>›</span>
+                <a href="#" th:text="${thread.communityId}">Comunidad</a> <span>›</span>
+                <span th:text="${thread.id}">Hilo</span>
+            </div>
+            <h1 class="thread-detail-title" th:text="${thread.title}">Título del Hilo</h1>
+            <div class="thread-detail-desc" th:text="${thread.description}">Descripción del hilo...</div>
+            <div class="thread-detail-meta">
+                <div class="thread-detail-meta-avatar" th:text="${thread.ownerUsername != null ? thread.ownerUsername.substring(0,1) : 'U'}">U</div>
+                <span>Publicado por <strong th:text="${thread.ownerUsername}">Usuario</strong></span>
+            </div>
+        </div>
+
+        <div class="new-post-form">
+            <form th:action="@{/posts/create}" method="post">
+                <input type="hidden" name="threadId" th:value="${thread.id}" />
+                <div class="new-post-form-label">Escribe un post</div>
+                <input type="text" name="title" class="new-post-input" placeholder="Título del post" required>
+                <textarea name="content" class="new-post-textarea" placeholder="¿Qué opinas?"></textarea>
+                <div class="new-post-actions">
+                    <button type="submit" class="btn-submit">Publicar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="posts-section-header">
+            Posts <span class="posts-count-badge" th:text="${#lists.size(posts)}">0</span>
+        </div>
+
+        <div th:each="post : ${posts}" th:if="${post != null}">
+            <div th:insert="~{::postCard(post=${post})}"></div>
+        </div>
+    </main>
+
+    <aside class="right-panel">
+        <div class="dunkel-widget" style="visibility: hidden; border: none; background: transparent;"></div>
+    </aside>
+
+</div>
+
+<div th:fragment="postCard(post)" th:if="${post != null}">
+    <div class="post-card">
+        <div class="post-card-header">
+            <div class="post-card-author">
+                <div class="post-avatar" 
+                     th:style="'background-color: #6a5acd;'"
+                     th:text="${post.ownerUsername != null ? post.ownerUsername.substring(0,1) : 'U'}">U</div>
+                <div class="post-author-info">
+                    <span class="post-author-name" th:text="${post.ownerUsername}">Autor</span>
+                </div>
+            </div>
+        </div>
+        <div class="post-card-body">
+            <div class="post-card-title" th:text="${post.title}">Título</div>
+            <div class="post-card-content" th:utext="${post.content}">Contenido</div>
+        </div>
+
+		<div class="post-card-footer">
+            <div class="post-collapse-area">
+                <button class="post-action-btn collapse-toggle" type="button"
+                        th:if="${post.replies != null and #lists.size(post.replies) > 0}"
+                        th:attr="data-target='replies-' + ${post.id}">▸</button>
+                
+                <span class="reply-count-badge" th:if="${post.replies != null and #lists.size(post.replies) > 0}" th:text="${#lists.size(post.replies)}">0</span>
+            </div>
+            <button class="post-action-btn reply-toggle" type="button" th:attr="data-target='reply-form-' + ${post.id}">💬 Responder</button>
+            <button type="button" class="post-vote-btn like">👍 <span class="post-vote-count" th:text="${post.likes}">0</span></button>
+            <button type="button" class="post-vote-btn dislike">👎 <span class="post-vote-count" th:text="${post.dislikes}">0</span></button>
+        </div>
+
+        <div class="reply-form" th:id="${'reply-form-' + post.id}">
+            <form th:action="@{/posts/create}" method="post">
+                <input type="hidden" name="threadId" th:value="${post.threadId}" />
+                <input type="hidden" name="parentId" th:value="${post.id}" />
+                <textarea name="content" placeholder="Escribe tu respuesta..."></textarea>
+                <div class="reply-form-actions">
+                    <button class="btn-cancel cancel-reply" type="button" th:attr="data-target='reply-form-' + ${post.id}">Cancelar</button>
+                    <button class="btn-reply-submit" type="submit">Responder</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="replies-container collapsed" th:id="${'replies-' + post.id}">
+            <div th:each="reply : ${post.replies}" th:if="${reply != null}">
+                <div th:insert="~{::postCard(post=${reply})}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tema claro/oscuro
+    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-theme');
+
+    // Mostrar/ocultar formulario de respuesta
+    document.querySelectorAll('.reply-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const form = document.getElementById(btn.getAttribute('data-target'));
+            if (form) form.classList.toggle('active');
+        });
+    });
+
+    document.querySelectorAll('.cancel-reply').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const form = document.getElementById(btn.getAttribute('data-target'));
+            if (form) form.classList.remove('active');
+        });
+    });
+
+    // Colapsar/expandir respuestas
+    document.querySelectorAll('.collapse-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const container = document.getElementById(btn.getAttribute('data-target'));
+            if (container) {
+                const isCollapsed = container.classList.toggle('collapsed');
+                btn.textContent = isCollapsed ? '▸' : '▾';
+                const badge = btn.nextElementSibling;
+                if (badge) badge.classList.toggle('hidden', !isCollapsed);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

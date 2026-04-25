@@ -65,6 +65,22 @@ public class Post {
         this.content = content;
     }
 
+    public Integer getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Integer likes) {
+        this.likes = likes;
+    }
+
+    public Integer getDislikes() {
+        return dislikes;
+    }
+
+    public void setDislikes(Integer dislikes) {
+        this.dislikes = dislikes;
+    }
+
     public User getOwner() {
         return owner;
     }
@@ -97,4 +113,3 @@ public class Post {
         this.replies = replies;
     }
 }
-

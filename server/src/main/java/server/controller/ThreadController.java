@@ -124,7 +124,7 @@ public class ThreadController {
     @GetMapping("/search")
     public ResponseEntity<List<ThreadDTO>> getThreadsWithPrompt(
             @Parameter(description = "Texto a buscar en título", example = "IDE", required = true)
-            @RequestParam String query) {
+            @RequestParam(value = "query") String query) {
         List<Thread> threads = threadService.getThreadsWithPrompt(query);
         List<ThreadDTO> result = threads.stream()
                 .map(thread -> new ThreadDTO(
@@ -141,7 +141,7 @@ public class ThreadController {
     @GetMapping("/user")
     public ResponseEntity<List<ThreadDTO>> getThreadsFromUser(
             @Parameter(description = "Email del propietario", example = "test@test.com", required = true)
-            @RequestParam String email) {
+            @RequestParam(value = "email") String email) {
         List<Thread> threads = threadService.getThreadsFromUser(email);
         List<ThreadDTO> result = threads.stream()
                 .map(thread -> new ThreadDTO(
@@ -180,7 +180,7 @@ public class ThreadController {
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getHilo(
             @Parameter(description = "ID del hilo a consultar", example = "1", required = true)
-            @PathVariable Integer id
+            @PathVariable(value = "id") Integer id
     ) {
         try {
             ThreadDTO hilo = threadService.getThread(id);
@@ -272,7 +272,7 @@ public class ThreadController {
             )
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @Parameter(description = "ID del hilo a añadir a favoritos", required = true)
-            @PathVariable Integer id) {
+            @PathVariable(value = "id") Integer id) {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -313,7 +313,7 @@ public class ThreadController {
             )
             @RequestHeader(value = "Authorization", required = false) String authHeader,
             @Parameter(description = "ID del hilo a quitar de favoritos", required = true)
-            @PathVariable Integer id) {
+            @PathVariable(value = "id") Integer id) {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
