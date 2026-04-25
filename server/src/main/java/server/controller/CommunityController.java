@@ -45,7 +45,7 @@ public class CommunityController {
     @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "bearerAuth")
     @PostMapping("/create")
     public ResponseEntity<?> createCommunity(
-            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestHeader(value = "Authorization", required = true) String authHeader,
             @RequestBody CreateCommunityDTO dto) {
         try {
             String token = authHeader.replace("Bearer ", "");
@@ -70,7 +70,7 @@ public class CommunityController {
 
     @GetMapping("/my_communities")
     public ResponseEntity<List<CommunityDTO>> getMyCommunities(
-            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+            @RequestHeader(value = "Authorization", required = true) String authHeader) {
         try {
             String token = authHeader.replace("Bearer ", "");
             List<CommunityDTO> myCommunities = communityService.getUserCommunities(token);
