@@ -3,14 +3,18 @@ package client.controller;
 import client.service.AuthServiceProxy;
 import client.service.CommunityServiceProxy;
 import client.service.ThreadServiceProxy;
+import client.service.PostServiceProxy;
 import lib.dto.CommunityDTO;
 import lib.dto.CreateThreadDTO;
 import lib.dto.ThreadDTO;
 import lib.dto.ThreadSummaryDTO;
+import lib.dto.PostDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -20,6 +24,9 @@ public class ThreadController {
     private final ThreadServiceProxy threadService;
     private final AuthServiceProxy authService;
     private final CommunityServiceProxy communityService;
+    // make postService optional for test contexts
+    @Autowired(required = false)
+    private PostServiceProxy postService;
 
     public ThreadController(ThreadServiceProxy threadService,
                             AuthServiceProxy authService,
@@ -64,7 +71,14 @@ public class ThreadController {
         ThreadDTO thread = threadService.getThread(id);
         if (thread == null) return "redirect:/threads";
         model.addAttribute("thread", thread);
-        return "threads/detail";
+        // Load posts for this thread (may return empty list)
+        List<PostDTO> posts = Collections.emptyList();
+        if (postService != null) {
+            posts = postService.getPostsByThread(id);
+        }
+        model.addAttribute("posts", posts);
+        // Return the existing template name (templates/threadDetail.html)
+        return "threadDetail";
     }
 
     @PostMapping("/create")

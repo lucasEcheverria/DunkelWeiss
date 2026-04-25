@@ -1,5 +1,6 @@
 <article class="dunkel-thread-box" th:fragment="box(thread)">
-    <a th:href="@{/thread/{id}(id=${thread.id})}" style="text-decoration: none; color: inherit;">
+    <!-- Fixed route: thread controller listens on /threads/{id} -->
+    <a th:href="@{/threads/{id}(id=${thread.id})}" style="text-decoration: none; color: inherit;">
     <header class="thread-header">
         <div class="thread-header-main">
             <h2 th:text="${thread.title}" class="thread-title">Título del Post</h2>
