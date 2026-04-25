@@ -1,5 +1,5 @@
 # DunkelWeiss
-
+[![Java CI](https://github.com/lucasEcheverria/DunkelWeiss/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/lucasEcheverria/DunkelWeiss/actions/workflows/gradle-ci.yml)
 ## 📦 Dependencias
 
 Antes de comenzar, asegúrate de tener instalado:
