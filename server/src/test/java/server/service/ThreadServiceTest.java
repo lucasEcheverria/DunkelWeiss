@@ -16,11 +16,13 @@ import server.entity.Community;
 import server.entity.Thread;
 import server.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import org.mockito.ArgumentCaptor;
 
 @ExtendWith(MockitoExtension.class)
 public class ThreadServiceTest {
@@ -37,6 +39,157 @@ public class ThreadServiceTest {
     @BeforeEach
     void setUp() {
         threadService = new ThreadService(threadRepository, userRepository, communityRepository);
+    }
+
+    // ==========================================
+    // Favorites
+    // ==========================================
+
+    @Nested
+    class Favorites {
+
+        @Test
+        void addFavoriteThread_addsAndSavesWhenNotPresent() {
+            User owner = buildUser("fav@u.com", "alice");
+            Community community = buildCommunity(1, "General");
+            Thread hilo = buildThread(10, "T", "D", owner, community);
+
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(10)).thenReturn(Optional.of(hilo));
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            threadService.addFavoriteThread(owner, 10);
+
+            ArgumentCaptor<User> cap = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(cap.capture());
+            User saved = cap.getValue();
+            assertThat(saved.getFavoriteThreads()).isNotNull();
+            assertThat(saved.getFavoriteThreads()).hasSize(1);
+            assertThat(saved.getFavoriteThreads().get(0).getId()).isEqualTo(10);
+        }
+
+        @Test
+        void addFavoriteThread_doesNotSaveWhenAlreadyPresent() {
+            User owner = buildUser("fav@u.com", "alice");
+            Community community = buildCommunity(1, "General");
+            Thread hilo = buildThread(11, "T2", "D2", owner, community);
+
+            // owner already has hilo in favorites
+            owner.setFavoriteThreads(new ArrayList<>());
+            owner.getFavoriteThreads().add(hilo);
+
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(11)).thenReturn(Optional.of(hilo));
+
+            threadService.addFavoriteThread(owner, 11);
+
+            verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        void addFavoriteThread_throwsWhenUserNotFound() {
+            User owner = buildUser("x@x.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> threadService.addFavoriteThread(owner, 1))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(String.valueOf(owner.getId()));
+        }
+
+        @Test
+        void addFavoriteThread_throwsWhenThreadNotFound() {
+            User owner = buildUser("x@x.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(99)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> threadService.addFavoriteThread(owner, 99))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("99");
+        }
+
+        @Test
+        void removeFavoriteThread_removesAndSavesWhenPresent() {
+            User owner = buildUser("r@r.com", "alice");
+            Community community = buildCommunity(2, "Tech");
+            Thread hilo = buildThread(20, "TT", "DD", owner, community);
+
+            owner.setFavoriteThreads(new ArrayList<>());
+            owner.getFavoriteThreads().add(hilo);
+
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(20)).thenReturn(Optional.of(hilo));
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+            threadService.removeFavoriteThread(owner, 20);
+
+            ArgumentCaptor<User> cap = ArgumentCaptor.forClass(User.class);
+            verify(userRepository).save(cap.capture());
+            User saved = cap.getValue();
+            assertThat(saved.getFavoriteThreads()).isEmpty();
+        }
+
+        @Test
+        void removeFavoriteThread_throwsWhenNotInFavorites() {
+            User owner = buildUser("r@r.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(30)).thenReturn(Optional.of(buildThread(30, "X", "Y", owner, buildCommunity(1, "G"))));
+
+            assertThatThrownBy(() -> threadService.removeFavoriteThread(owner, 30))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("30");
+        }
+
+        @Test
+        void removeFavoriteThread_throwsWhenUserNotFound() {
+            User owner = buildUser("no@u.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> threadService.removeFavoriteThread(owner, 5))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(String.valueOf(owner.getId()));
+        }
+
+        @Test
+        void removeFavoriteThread_throwsWhenThreadNotFound() {
+            User owner = buildUser("no@u.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+            when(threadRepository.findById(999)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> threadService.removeFavoriteThread(owner, 999))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("999");
+        }
+
+        @Test
+        void getFavoriteThreads_returnsListOrEmpty() {
+            User owner = buildUser("g@u.com", "alice");
+            Thread t = buildThread(40, "Title", "Desc", owner, buildCommunity(1, "G"));
+
+            owner.setFavoriteThreads(new ArrayList<>());
+            owner.getFavoriteThreads().add(t);
+
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+
+            var res = threadService.getFavoriteThreads(owner);
+            assertThat(res).hasSize(1);
+
+            // null favorites -> empty list
+            User other = buildUser("h@u.com", "alice");
+            other.setFavoriteThreads(null);
+            when(userRepository.findById(other.getId())).thenReturn(Optional.of(other));
+            var res2 = threadService.getFavoriteThreads(other);
+            assertThat(res2).isEmpty();
+        }
+
+        @Test
+        void getFavoriteThreads_throwsWhenUserNotFound() {
+            User owner = buildUser("missing@u.com", "alice");
+            when(userRepository.findById(owner.getId())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> threadService.getFavoriteThreads(owner))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining(String.valueOf(owner.getId()));
+        }
     }
 
     // ==========================================
@@ -89,7 +242,7 @@ public class ThreadServiceTest {
     }
 
     // ==========================================
-    // GetAllSummaries
+    // GetThread
     // ==========================================
 
     @Nested

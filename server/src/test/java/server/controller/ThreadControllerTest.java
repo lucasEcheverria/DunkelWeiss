@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -261,6 +262,19 @@ class ThreadControllerTest {
         }
 
         @Test
+        void withThreadHavingNullOwnerAndCommunity_ReturnsNullFields() throws Exception {
+            server.entity.Thread thread = buildThread(2, "Orphan Thread", "desc", null, null);
+
+            when(threadService.getThreadsFromUser("email@email.com")).thenReturn(List.of(thread));
+
+            mockMvc.perform(get("/api/threads/user").param("email", "email@email.com"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1))
+                    .andExpect(jsonPath("$[0].ownerUsername").isEmpty())
+                    .andExpect(jsonPath("$[0].communityId").isEmpty());
+        }
+
+        @Test
         void withUserWithNoThreads_ReturnsOkAndEmptyList() throws Exception {
             when(threadService.getThreadsFromUser("empty@email.com")).thenReturn(Collections.emptyList());
 
@@ -300,6 +314,140 @@ class ThreadControllerTest {
             mockMvc.perform(get("/api/threads/thread_feed"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.length()").value(0));
+        }
+    }
+
+    // ==========================================
+    // GET/POST/DELETE /api/threads/favorites
+    // ==========================================
+
+    @Nested
+    class Favorites {
+
+        @Test
+        void getFavorites_withValidToken_ReturnsOkAndList() throws Exception {
+            server.entity.Thread thread = buildThread(2, "Fav Thread", "desc", user, buildCommunity("Music"));
+
+            when(authService.getUserByToken(token)).thenReturn(user);
+            when(threadService.getFavoriteThreads(user)).thenReturn(List.of(thread));
+
+            mockMvc.perform(get("/api/threads/favorites").header("Authorization", bearerToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1))
+                    .andExpect(jsonPath("$[0].id").value(2))
+                    .andExpect(jsonPath("$[0].title").value("Fav Thread"))
+                    .andExpect(jsonPath("$[0].ownerUsername").value("nickname"))
+                    .andExpect(jsonPath("$[0].communityId").value("Music"));
+        }
+
+        @Test
+        void getFavorites_withThreadHavingNullOwnerAndCommunity_ReturnsNullFields() throws Exception {
+            server.entity.Thread thread = buildThread(3, "Orphan Fav", "desc", null, null);
+
+            when(authService.getUserByToken(token)).thenReturn(user);
+            when(threadService.getFavoriteThreads(user)).thenReturn(List.of(thread));
+
+            mockMvc.perform(get("/api/threads/favorites").header("Authorization", bearerToken))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1))
+                    .andExpect(jsonPath("$[0].ownerUsername").isEmpty())
+                    .andExpect(jsonPath("$[0].communityId").isEmpty());
+        }
+
+        @Test
+        void getFavorites_withoutAuthorizationHeader_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(get("/api/threads/favorites"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void getFavorites_withMalformedToken_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(get("/api/threads/favorites").header("Authorization", "NoBearerToken"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void getFavorites_withInvalidToken_ReturnsForbidden() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(null);
+
+            mockMvc.perform(get("/api/threads/favorites").header("Authorization", bearerToken))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void addFavorite_withValidToken_ReturnsOk() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(user);
+
+            mockMvc.perform(post("/api/threads/favorites/10").header("Authorization", bearerToken))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        void addFavorite_withoutAuthorizationHeader_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(post("/api/threads/favorites/10"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void addFavorite_withMalformedToken_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(post("/api/threads/favorites/10").header("Authorization", "NoBearer"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void addFavorite_withInvalidToken_ReturnsForbidden() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(null);
+
+            mockMvc.perform(post("/api/threads/favorites/10").header("Authorization", bearerToken))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void addFavorite_serviceThrowsBadRequest_ReturnsBadRequest() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(user);
+            doThrow(new IllegalArgumentException("Thread no encontrado: 99")).when(threadService).addFavoriteThread(any(User.class), org.mockito.Mockito.eq(99));
+
+            mockMvc.perform(post("/api/threads/favorites/99").header("Authorization", bearerToken))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("Thread no encontrado: 99"));
+        }
+
+        @Test
+        void removeFavorite_withValidToken_ReturnsOk() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(user);
+
+            mockMvc.perform(delete("/api/threads/favorites/20").header("Authorization", bearerToken))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        void removeFavorite_serviceThrowsBadRequest_ReturnsBadRequest() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(user);
+            doThrow(new IllegalArgumentException("El hilo no está en favoritos: 30")).when(threadService).removeFavoriteThread(any(User.class), org.mockito.Mockito.eq(30));
+
+            mockMvc.perform(delete("/api/threads/favorites/30").header("Authorization", bearerToken))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("El hilo no está en favoritos: 30"));
+        }
+
+        @Test
+        void removeFavorite_withoutAuthorizationHeader_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(delete("/api/threads/favorites/20"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void removeFavorite_withMalformedToken_ReturnsUnauthorized() throws Exception {
+            mockMvc.perform(delete("/api/threads/favorites/20").header("Authorization", "NoBearer"))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        void removeFavorite_withInvalidToken_ReturnsForbidden() throws Exception {
+            when(authService.getUserByToken(token)).thenReturn(null);
+
+            mockMvc.perform(delete("/api/threads/favorites/20").header("Authorization", bearerToken))
+                    .andExpect(status().isForbidden());
         }
     }
 

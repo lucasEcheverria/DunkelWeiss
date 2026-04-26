@@ -341,4 +341,147 @@ public class ThreadServiceProxyTest {
             assertThat(result).isEmpty();
         }
     }
+
+    // ==========================================
+    // Favorites
+    // ==========================================
+
+    @Nested
+    class Favorites {
+
+        @Test
+        void getFavoriteThreads_ReturnsList_whenLoggedIn() {
+            List<ThreadDTO> expected = List.of(
+                    new ThreadDTO(10, "Fav A", "d", "sam", "General")
+            );
+
+            when(authService.getToken()).thenReturn("tok");
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/favorites"),
+                    eq(HttpMethod.GET),
+                    any(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(expected));
+
+            List<ThreadDTO> result = threadServiceProxy.getFavoriteThreads();
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).id()).isEqualTo(10);
+        }
+
+        @Test
+        void getFavoriteThreads_ReturnsEmpty_whenExceptionThrown() {
+            when(authService.getToken()).thenReturn("tok");
+
+            // Simulate RestTemplate throwing any runtime exception to hit the catch block
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/favorites"),
+                    eq(HttpMethod.GET),
+                    any(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)
+            )).thenThrow(new RuntimeException("boom"));
+
+            List<ThreadDTO> result = threadServiceProxy.getFavoriteThreads();
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void getFavoriteThreads_ReturnsEmpty_whenBodyIsNull() {
+            when(authService.getToken()).thenReturn("tok");
+
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/favorites"),
+                    eq(HttpMethod.GET),
+                    any(HttpEntity.class),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(null));
+
+            List<ThreadDTO> result = threadServiceProxy.getFavoriteThreads();
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void getFavoriteThreads_ReturnsEmpty_whenNoToken() {
+            when(authService.getToken()).thenReturn(null);
+
+            List<ThreadDTO> result = threadServiceProxy.getFavoriteThreads();
+
+            assertThat(result).isEmpty();
+            verifyNoInteractions(restTemplate);
+        }
+
+        @Test
+        void addFavorite_ReturnsTrue_whenSuccessful() {
+            when(authService.getToken()).thenReturn("tok");
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/favorites/5"),
+                    eq(HttpMethod.POST),
+                    any(HttpEntity.class),
+                    eq(Void.class)
+            )).thenReturn(ResponseEntity.ok().build());
+
+            boolean ok = threadServiceProxy.addFavorite(5);
+
+            assertThat(ok).isTrue();
+        }
+
+        @Test
+        void addFavorite_ReturnsFalse_whenNoToken() {
+            when(authService.getToken()).thenReturn(null);
+
+            boolean ok = threadServiceProxy.addFavorite(5);
+
+            assertThat(ok).isFalse();
+            verifyNoInteractions(restTemplate);
+        }
+
+        @Test
+        void addFavorite_ReturnsFalse_whenException() {
+            when(authService.getToken()).thenReturn("tok");
+            when(restTemplate.exchange(anyString(), any(), any(HttpEntity.class), eq(Void.class)))
+                    .thenThrow(new RuntimeException("fail"));
+
+            boolean ok = threadServiceProxy.addFavorite(5);
+
+            assertThat(ok).isFalse();
+        }
+
+        @Test
+        void removeFavorite_ReturnsTrue_whenSuccessful() {
+            when(authService.getToken()).thenReturn("tok");
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/favorites/5"),
+                    eq(HttpMethod.DELETE),
+                    any(HttpEntity.class),
+                    eq(Void.class)
+            )).thenReturn(ResponseEntity.ok().build());
+
+            boolean ok = threadServiceProxy.removeFavorite(5);
+
+            assertThat(ok).isTrue();
+        }
+
+        @Test
+        void removeFavorite_ReturnsFalse_whenNoToken() {
+            when(authService.getToken()).thenReturn(null);
+
+            boolean ok = threadServiceProxy.removeFavorite(5);
+
+            assertThat(ok).isFalse();
+            verifyNoInteractions(restTemplate);
+        }
+
+        @Test
+        void removeFavorite_ReturnsFalse_whenException() {
+            when(authService.getToken()).thenReturn("tok");
+            when(restTemplate.exchange(anyString(), any(), any(HttpEntity.class), eq(Void.class)))
+                    .thenThrow(new RuntimeException("fail"));
+
+            boolean ok = threadServiceProxy.removeFavorite(5);
+
+            assertThat(ok).isFalse();
+        }
+    }
 }

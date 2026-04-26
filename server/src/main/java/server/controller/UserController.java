@@ -8,6 +8,8 @@ import lib.dto.UpdateUserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +41,13 @@ public class UserController {
     )
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(
-            @RequestHeader(value = "Authorization", required = true) String authHeader) {
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
 
         String token = null;
         if (authHeader != null && !authHeader.isBlank()) {
@@ -70,7 +78,13 @@ public class UserController {
     )
     @PutMapping("/me/update")
     public ResponseEntity<UserDTO> updateCurrentUser(
-            @RequestHeader(value = "Authorization", required = true) String authHeader,
+            @Parameter(
+                    name = "Authorization",
+                    description = "Token de sesión en formato Bearer <token>",
+                    required = true,
+                    in = ParameterIn.HEADER
+            )
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
             @RequestBody(required = false) Map<String, Object> body) {
 
         if (body == null) {

@@ -3,103 +3,224 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>DunkelWeiss</title>
-    <link rel="stylesheet" th:href="@{/css/auth.css}"/>
-</head>
-<body>
+    <title>DunkelWeiss - Acceso</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
 
-<!-- ── Cabecera con botón de alternancia ──
-     El botón cambia entre "Sign In" y "Sign Up" mostrando/ocultando
-     el formulario correspondiente sin recargar la página. -->
-<header>
-    <button class="toggle-btn" id="toggle-btn" onclick="toggleMode()">
-        <!-- El texto del botón se actualiza al cambiar de modo -->
-        Sign Up
-    </button>
+    <style>
+        /* Estilos específicos para centrar el login en medio de la pantalla */
+        .auth-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 60px); /* 100vh menos el alto del navbar */
+            margin-top: 60px;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .auth-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-form-group {
+            margin-bottom: 18px;
+        }
+
+        .auth-form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .auth-input {
+            width: 100%;
+            height: 44px;
+            background-color: var(--bg-surface-hover);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0 16px;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--brand-color);
+            box-shadow: 0 0 0 1px var(--brand-color);
+        }
+
+        .btn-auth-submit {
+            width: 100%;
+            background-color: var(--brand-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 16px;
+        }
+
+        .btn-auth-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+        }
+
+        .error-box {
+            background-color: rgba(255, 82, 82, 0.1);
+            border-left: 4px solid var(--dislike-color);
+            color: #ff5252;
+            padding: 12px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* Animación para la bandera */
+        .flag-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .flag-link:hover {
+            transform: scale(1.15);
+        }
+
+        /* Contenedor a pantalla completa para el Rickroll */
+        #rickroll-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999; /* Para que quede por encima de todo */
+            background-color: black;
+        }
+    </style>
+</head>
+<body class="dark-theme">
+
+<div id="rickroll-container">
+    <iframe id="rickroll-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+</div>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <div class="brand-container" onclick="window.location.href='/home'">
+                <span class="brand-logo">🕸️</span>
+                <h1 class="brand-name">Dunkelweiss</h1>
+            </div>
+
+            <a onclick="activarRickroll()" class="flag-link">
+                <span style="font-size: 36px; margin-left: 10px; line-height: 1;">🇪🇸</span>
+            </a>
+        </div>
+
+        <div class="nav-right">
+            <button class="btn btn-outline" id="toggle-btn" onclick="toggleMode()">
+                Sign Up
+            </button>
+
+            <a th:href="@{/home}" class="btn icon-btn-ghost" style="text-decoration: none; font-size: 15px;">
+                Volver
+            </a>
+        </div>
+    </div>
 </header>
 
-<main>
-    <div class="card">
+<div class="auth-wrapper">
+    <div class="auth-card">
 
-        <!-- ── Formulario de Sign In ── -->
         <div id="signin-section">
-            <h1>Sign In</h1>
+            <h2 class="auth-title">Iniciar Sesión</h2>
 
-            <!-- Mensaje de error: solo visible si Thymeleaf recibe error=true -->
-            <div class="error-msg" th:if="${error}">
+            <div class="error-box" th:if="${error}">
                 Usuario o contraseña incorrectos.
             </div>
 
             <form th:action="@{/login}" method="post">
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label for="signin-email">Email</label>
-                    <input type="email" id="signin-email" name="email"
+                    <input type="email" id="signin-email" name="email" class="auth-input"
                            placeholder="Tu correo electrónico" required/>
                 </div>
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label for="signin-password">Contraseña</label>
-                    <input type="password" id="signin-password" name="password"
+                    <input type="password" id="signin-password" name="password" class="auth-input"
                            placeholder="Tu contraseña" required/>
                 </div>
-                <button type="submit" class="submit-btn">Iniciar sesión</button>
+                <button type="submit" class="btn-auth-submit">Entrar</button>
             </form>
         </div>
 
-        <!-- ── Formulario de Sign Up ── -->
         <div id="signup-section" style="display:none;">
-            <h1>Sign Up</h1>
+            <h2 class="auth-title">Crear Cuenta</h2>
 
-            <!-- Mensaje de error: solo visible si Thymeleaf recibe error=true en modo signup -->
-            <div class="error-msg" th:if="${error}">
-                El nombre de usuario ya existe. Prueba con otro.
+            <div class="error-box" th:if="${error}">
+                El email o nombre de usuario ya existe.
             </div>
 
             <form th:action="@{/register}" method="post">
-                <!-- NEW: Email field placed above the username -->
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" name="email"
+                    <input type="email" id="signup-email" name="email" class="auth-input"
                            placeholder="tu@ejemplo.com" required/>
                 </div>
 
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label for="signup-username">Usuario</label>
-                    <input type="text" id="signup-username" name="username"
+                    <input type="text" id="signup-username" name="username" class="auth-input"
                            placeholder="Elige un nombre de usuario" required/>
                 </div>
-                <div class="form-group">
+                <div class="auth-form-group">
                     <label for="signup-password">Contraseña</label>
-                    <input type="password" id="signup-password" name="password"
-                           placeholder="Elige una contraseña" required/>
+                    <input type="password" id="signup-password" name="password" class="auth-input"
+                           placeholder="Elige una contraseña segura" required/>
                 </div>
-                <button type="submit" class="submit-btn">Crear cuenta</button>
+                <button type="submit" class="btn-auth-submit">Registrarse</button>
             </form>
         </div>
 
     </div>
-</main>
+</div>
 
 <script>
-    /**
-     * Inicialización: si el servidor devolvió mode=signup en la URL
-     * (ej. tras un error de registro), arrancamos en modo signup.
-     */
     const urlParams = new URLSearchParams(window.location.search);
     const initialMode = urlParams.get('mode') || 'signin';
     if (initialMode === 'signup') {
         showSignup();
     }
 
-    /**
-     * Alterna entre los formularios de Sign In y Sign Up.
-     * Muestra el formulario correspondiente y actualiza el texto del botón.
-     */
     function toggleMode() {
         const signinSection = document.getElementById('signin-section');
-        const signupSection = document.getElementById('signup-section');
-        const btn = document.getElementById('toggle-btn');
-
-        // Comprueba qué sección está activa y cambia a la contraria
         if (signinSection.style.display !== 'none') {
             showSignup();
         } else {
@@ -107,20 +228,27 @@
         }
     }
 
-    /** Muestra el formulario de Sign In y oculta el de Sign Up. */
     function showSignin() {
         document.getElementById('signin-section').style.display = 'block';
         document.getElementById('signup-section').style.display = 'none';
-        document.getElementById('toggle-btn').textContent = 'Sign Up';
+        document.getElementById('toggle-btn').textContent = 'Crear cuenta';
     }
 
-    /** Muestra el formulario de Sign Up y oculta el de Sign In. */
     function showSignup() {
         document.getElementById('signin-section').style.display = 'none';
         document.getElementById('signup-section').style.display = 'block';
-        document.getElementById('toggle-btn').textContent = 'Sign In';
+        document.getElementById('toggle-btn').textContent = 'Iniciar sesión';
+    }
+
+    /* ── NUEVO: Función para ejecutar la trampa ── */
+    function activarRickroll() {
+        // Muestra el div que ocupa toda la pantalla
+        document.getElementById('rickroll-container').style.display = 'block';
+
+        // Inyecta la URL con el autoplay en el iframe en el momento exacto del clic
+        // Esto asegura que el navegador valide la acción y no bloquee el sonido
+        document.getElementById('rickroll-frame').src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
     }
 </script>
-
 </body>
 </html>
