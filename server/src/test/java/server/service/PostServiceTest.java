@@ -248,4 +248,32 @@ class PostServiceTest {
         post.setDislikes(0);
         return post;
     }
+
+    @Test
+    void getPostsByThread_PostWithNullOwner_ReturnsNullUsername() {
+        Post post = createPost(1, "Post", "Contenido", null, thread, null);
+        post.setReplies(Collections.emptyList());
+
+        when(threadRepository.findById(1)).thenReturn(Optional.of(thread));
+        when(postRepository.findRootPostsByThreadId(1)).thenReturn(List.of(post));
+
+        List<PostDTO> result = postService.getPostsByThread(1);
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).ownerUsername());
+    }
+
+    @Test
+    void getPostsByThread_PostWithNullThread_ReturnsNullThreadId() {
+        Post post = createPost(1, "Post", "Contenido", user, null, null);
+        post.setReplies(Collections.emptyList());
+
+        when(threadRepository.findById(1)).thenReturn(Optional.of(thread));
+        when(postRepository.findRootPostsByThreadId(1)).thenReturn(List.of(post));
+
+        List<PostDTO> result = postService.getPostsByThread(1);
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).threadId());
+    }
 }
