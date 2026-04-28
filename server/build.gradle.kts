@@ -14,11 +14,20 @@ sourceSets {
         compileClasspath += sourceSets["main"].output + sourceSets["test"].output
         runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
     }
+    create("performanceTest") {
+        java.srcDir("src/performanceTest/java")
+        resources.srcDir("src/performanceTest/resources")
+        compileClasspath += sourceSets["main"].output + sourceSets["test"].output
+        runtimeClasspath += sourceSets["main"].output + sourceSets["test"].output
+    }
 }
 
 configurations {
     getByName("integrationTestImplementation").extendsFrom(configurations["testImplementation"])
     getByName("integrationTestRuntimeOnly").extendsFrom(configurations["testRuntimeOnly"])
+    getByName("performanceTestImplementation").extendsFrom(configurations["testImplementation"])
+    getByName("performanceTestRuntimeOnly").extendsFrom(configurations["testRuntimeOnly"])
+
 }
 
 // ── Dependencies ───────────────────────────────────────────────────────
@@ -52,10 +61,17 @@ tasks.register<Test>("integrationTest") {
     systemProperty("spring.docker.compose.enabled", "false")
     systemProperty("api.version", "1.41")
 }
+tasks.register<Test>("performanceTest") {
+    description = "Ejecuta los tests de rendimiento"
+    group = "verification"
+    testClassesDirs = sourceSets["performanceTest"].output.classesDirs
+    classpath = sourceSets["performanceTest"].runtimeClasspath
+    useJUnitPlatform()
+}
 
 // build will not launch the tests
 tasks.build {
-    setDependsOn(dependsOn.filter { it.toString() != "integrationTest" })
+    setDependsOn(dependsOn.filter { it.toString() != "integrationTest" && it.toString() != "performanceTest"  })
 }
 
 tasks.withType<ProcessResources> {
