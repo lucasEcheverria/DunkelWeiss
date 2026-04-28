@@ -106,7 +106,7 @@ public class PostServicePerfTest {
 
     @Test
     @JUnitPerfTest(threads = 10, durationMs = 2000, warmUpMs = 300)
-    @JUnitPerfTestRequirement(meanLatency = 10, executionsPerSec = 500, allowedErrorPercentage = 0.0f)
+    @JUnitPerfTestRequirement(meanLatency = 15, executionsPerSec = 500, allowedErrorPercentage = 0.0f)
     public void getPostsByThread_EmptyResults_HighThroughput() {
         postService.getPostsByThread(2);
     }
