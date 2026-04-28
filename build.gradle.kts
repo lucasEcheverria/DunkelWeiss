@@ -59,4 +59,5 @@ subprojects {
             html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
         }
     }
+
 }
