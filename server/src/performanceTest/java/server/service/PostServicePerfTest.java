@@ -1,11 +1,20 @@
 package server.service;
 
+import com.github.noconnor.junitperf.JUnitPerfTest;
+import com.github.noconnor.junitperf.JUnitPerfTestRequirement;
+import com.github.noconnor.junitperf.JUnitPerfInterceptor;
+import com.github.noconnor.junitperf.reporting.providers.HtmlReportGenerator;
+import com.github.noconnor.junitperf.JUnitPerfTestActiveConfig;
+import com.github.noconnor.junitperf.JUnitPerfReportingConfig;
+
 import lib.dto.CreatePostDTO;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import server.dao.PostRepository;
 import server.dao.ThreadRepository;
@@ -13,24 +22,24 @@ import server.dao.UserRepository;
 import server.entity.Post;
 import server.entity.User;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(JUnitPerfInterceptor.class) // ESTO es lo que hace que JUnitPerf funcione en JUnit 5
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class PostServicePerfTest {
+
+    // Configuración del reporte HTML adaptada a JUnit 5
+    @JUnitPerfTestActiveConfig
+    private final static JUnitPerfReportingConfig PERF_CONFIG = JUnitPerfReportingConfig.builder()
+            .reportGenerator(new HtmlReportGenerator("build/reports/junitperf/report.html"))
+            .build();
 
     @Mock
     private PostRepository postRepository;
@@ -49,149 +58,88 @@ public class PostServicePerfTest {
     private Post rootPost;
     private Post replyPost;
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public void globalSetup() {
+        // Inicializa los mocks
+        MockitoAnnotations.openMocks(this);
+
         user = new User("perf@test.com", "PerfUser", "1234");
         user.setId(1);
 
         thread = new server.entity.Thread();
         thread.setId(1);
-        thread.setTitle("Hilo de rendimiento");
-        thread.setDescription("Test de performance");
 
-        rootPost = createPost(1, "Post raíz", "Contenido del post raíz", user, thread, null);
-        replyPost = createPost(2, "Respuesta", "Contenido de respuesta", user, thread, rootPost);
-        rootPost.setReplies(List.of(replyPost));
-        replyPost.setReplies(Collections.emptyList());
+        rootPost = new Post();
+        rootPost.setId(1);
 
-        lenient().when(threadRepository.findById(eq(1))).thenReturn(Optional.of(thread));
-        lenient().when(postRepository.findRootPostsByThreadId(eq(1))).thenReturn(List.of(rootPost));
-        lenient().when(postRepository.findById(eq(1))).thenReturn(Optional.of(rootPost));
-        lenient().when(postRepository.save(any(Post.class))).thenAnswer(invocation -> {
+        server.entity.Thread emptyThread = new server.entity.Thread();
+        emptyThread.setId(2);
+        emptyThread.setTitle("Hilo Vacío");
+
+        // STUBs
+        lenient().doReturn(Optional.of(emptyThread)).when(threadRepository).findById(eq(2));
+        lenient().doReturn(Collections.emptyList()).when(postRepository).findRootPostsByThreadId(eq(2));
+        lenient().doReturn(Optional.of(thread)).when(threadRepository).findById(eq(1));
+        lenient().doReturn(List.of(rootPost)).when(postRepository).findRootPostsByThreadId(eq(1));
+        lenient().doReturn(Optional.of(rootPost)).when(postRepository).findById(eq(1));
+
+        lenient().doAnswer(invocation -> {
             Post saved = invocation.getArgument(0);
             saved.setId(100);
-            saved.setReplies(Collections.emptyList());
             return saved;
-        });
+        }).when(postRepository).save(any(Post.class));
     }
 
-    // ==========================================
-    // Tests de rendimiento
-    // ==========================================
-
     @Test
+    @JUnitPerfTest(threads = 10, durationMs = 2000, warmUpMs = 500)
+    @JUnitPerfTestRequirement(meanLatency = 50, executionsPerSec = 100, allowedErrorPercentage = 0.0f)
     public void getPostsByThread_UnderLoad_MeetsLatencyRequirements() {
-        runPerformanceTest(
-                () -> postService.getPostsByThread(1),
-                10,     // threads
-                2000,   // durationMs
-                500,    // warmUpMs
-                50.0,   // maxMeanLatencyMs
-                100,    // minExecutionsPerSec
-                0.0f    // allowedErrorPercentage
-        );
+        postService.getPostsByThread(1);
     }
 
     @Test
+    @JUnitPerfTest(threads = 20, durationMs = 3000, warmUpMs = 500)
+    @JUnitPerfTestRequirement(meanLatency = 100, executionsPerSec = 50, allowedErrorPercentage = 0.0f)
     public void getPostsByThread_HighConcurrency_MeetsRequirements() {
-        runPerformanceTest(
-                () -> postService.getPostsByThread(1),
-                20, 3000, 500, 100.0, 50, 0.0f
-        );
+        postService.getPostsByThread(1);
     }
 
     @Test
+    @JUnitPerfTest(threads = 10, durationMs = 2000, warmUpMs = 300)
+    @JUnitPerfTestRequirement(meanLatency = 10, executionsPerSec = 500, allowedErrorPercentage = 0.0f)
     public void getPostsByThread_EmptyResults_HighThroughput() {
-        lenient().when(postRepository.findRootPostsByThreadId(eq(1))).thenReturn(Collections.emptyList());
-        runPerformanceTest(
-                () -> postService.getPostsByThread(1),
-                10, 2000, 300, 10.0, 500, 0.0f
-        );
+        postService.getPostsByThread(2);
     }
 
-    @Test
+    @Test // <-- IMPORTANTE: ¡Te faltaba esta anotación en este método!
+    @JUnitPerfTest(threads = 10, durationMs = 2000, warmUpMs = 500)
+    @JUnitPerfTestRequirement(meanLatency = 50, executionsPerSec = 100, allowedErrorPercentage = 0.0f)
     public void createPost_UnderLoad_MeetsLatencyRequirements() {
         CreatePostDTO dto = new CreatePostDTO("Post de perf", "Contenido de rendimiento", 1, null);
-        runPerformanceTest(
-                () -> postService.createPost(dto, user),
-                10, 2000, 500, 50.0, 100, 0.0f
-        );
+        postService.createPost(dto, user);
     }
 
     @Test
+    @JUnitPerfTest(threads = 10, durationMs = 2000, warmUpMs = 500)
+    @JUnitPerfTestRequirement(meanLatency = 50, executionsPerSec = 80, allowedErrorPercentage = 0.0f)
+    public void createPostWithReply_UnderLoad_MeetsLatencyRequirements() {
+        CreatePostDTO dto = new CreatePostDTO("Respuesta perf", "Contenido respuesta", 1, 1);
+        postService.createPost(dto, user);
+    }
+
+    @Test
+    @JUnitPerfTest(threads = 50, durationMs = 5000, warmUpMs = 1000)
+    @JUnitPerfTestRequirement(meanLatency = 200, executionsPerSec = 20, allowedErrorPercentage = 0.01f)
     public void createPost_StressTest_HandlesHighLoad() {
         CreatePostDTO dto = new CreatePostDTO("Stress test", "Contenido stress", 1, null);
-        runPerformanceTest(
-                () -> postService.createPost(dto, user),
-                50, 5000, 1000, 200.0, 20, 0.01f
-        );
+        postService.createPost(dto, user);
     }
 
-    // ==========================================
-    // Motor de Pruebas de Rendimiento (Sustituto de JUnitPerf)
-    // ==========================================
-
-    private void runPerformanceTest(Runnable task, int threads, long durationMs, long warmUpMs,
-                                    double maxMeanLatencyMs, int minExecutionsPerSec, float allowedErrorPercentage) {
-
-        // 1. Fase de Calentamiento (Warm-up)
-        long warmUpEnd = System.currentTimeMillis() + warmUpMs;
-        while (System.currentTimeMillis() < warmUpEnd) {
-            try { task.run(); } catch (Exception ignored) {}
-        }
-
-        // 2. Fase de Prueba Real
-        AtomicInteger successCount = new AtomicInteger(0);
-        AtomicInteger errorCount = new AtomicInteger(0);
-        AtomicLong totalLatencyNs = new AtomicLong(0);
-
-        ExecutorService executor = Executors.newFixedThreadPool(threads);
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + durationMs;
-
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-        for (int i = 0; i < threads; i++) {
-            futures.add(CompletableFuture.runAsync(() -> {
-                while (System.currentTimeMillis() < endTime) {
-                    long startOp = System.nanoTime();
-                    try {
-                        task.run();
-                        successCount.incrementAndGet();
-                    } catch (Exception e) {
-                        errorCount.incrementAndGet();
-                    } finally {
-                        totalLatencyNs.addAndGet(System.nanoTime() - startOp);
-                    }
-                }
-            }, executor));
-        }
-
-        // Esperar a que todos los hilos terminen
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-        executor.shutdown();
-
-        // 3. Cálculos y Aserciones
-        int totalExecutions = successCount.get() + errorCount.get();
-        double actualDurationSecs = durationMs / 1000.0;
-        double executionsPerSec = totalExecutions / actualDurationSecs;
-        double meanLatencyMs = totalExecutions > 0 ? (totalLatencyNs.get() / 1_000_000.0) / totalExecutions : 0;
-        float errorPercentage = totalExecutions > 0 ? (float) errorCount.get() / totalExecutions : 0;
-
-        System.out.printf("[PerfResult] Ops/sec: %.2f | Latencia Media: %.2fms | Errores: %.2f%%%n",
-                executionsPerSec, meanLatencyMs, errorPercentage * 100);
-
-        assertTrue(meanLatencyMs <= maxMeanLatencyMs,
-                String.format("La latencia media (%.2fms) superó el máximo permitido (%.2fms)", meanLatencyMs, maxMeanLatencyMs));
-        assertTrue(executionsPerSec >= minExecutionsPerSec,
-                String.format("El throughput (%.2f ops/s) fue menor al mínimo requerido (%d ops/s)", executionsPerSec, minExecutionsPerSec));
-        assertTrue(errorPercentage <= allowedErrorPercentage,
-                String.format("El porcentaje de errores (%.2f%%) superó el permitido (%.2f%%)", errorPercentage * 100, allowedErrorPercentage * 100));
+    @Test
+    public void debugTest() {
+        // Ejecuta esto una sola vez sin carga para ver el error en la consola
+        postService.getPostsByThread(2);
     }
-
-    // ==========================================
-    // Helper
-    // ==========================================
 
     private Post createPost(Integer id, String title, String content, User owner,
                             server.entity.Thread thread, Post parent) {

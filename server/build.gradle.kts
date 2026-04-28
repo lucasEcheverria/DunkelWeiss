@@ -40,6 +40,13 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 
+    testImplementation("com.github.noconnor:junitperf:1.37.0")
+    testImplementation("com.github.noconnor:junitperf-junit5:1.37.0")
+    testImplementation("junit:junit:4.13.2")
+    // TestContainers for performance
+    "performanceTestImplementation"("com.github.noconnor:junitperf:1.37.0")
+    "performanceTestImplementation"("com.github.noconnor:junitperf-junit5:1.37.0")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("com.h2database:h2")
 
