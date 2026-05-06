@@ -9,13 +9,19 @@
 </head>
 <body>
 
+<script>
+    if (localStorage.getItem('dunkel-theme') === 'light') {
+        document.body.classList.add('light-theme');
+    }
+</script>
+
 <header class="dunkel-navbar">
     <div class="navbar-content">
         <div class="nav-left">
             <button class="icon-btn-ghost">☰</button>
             <div class="brand-container">
                 <span class="brand-logo">🕸️</span>
-                <a th:href="@{${@authServiceProxy.getToken() != null ? '/home' : '/auth'}}" style="text-decoration: none; color: inherit;">
+                <a th:href="@{/home}" style="text-decoration: none; color: inherit;">
                     <h1 class="brand-name">Dunkelweiss</h1>
                 </a>
             </div>
@@ -33,7 +39,10 @@
         </div>
 
         <div class="nav-right">
-            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
+
             <a th:if="${@authServiceProxy.getToken() == null}"
                th:href="@{/auth}"
                class="btn btn-outline"
@@ -43,7 +52,7 @@
             <a th:if="${@authServiceProxy.getToken() != null}"
                th:href="@{/logout}"
                class="btn btn-outline"
-			   style="text-decoration: none;">
+               style="text-decoration: none;">
                 Logout
             </a>
             <a th:href="@{${@authServiceProxy.getToken() != null ? '/profile' : '/auth'}}"
@@ -67,7 +76,6 @@
             </a>
             <a th:href="@{${@authServiceProxy.getToken() != null ? '/communities/new' : '/auth'}}" class="menu-item"><span>🏘️</span> Crear Comunidad</a>
 
-            <a href="#" class="menu-item"><span>🧭</span> Explorar</a>
 
         </nav>
     </aside>
@@ -103,8 +111,32 @@
 </div>
 
 <script>
-    // Lógica del modo oscuro
-    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-theme');
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Función que pone el sol o la luna según toque
+        const updateIcon = () => {
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+        };
+
+        // Poner el icono correcto nada más cargar la página
+        updateIcon();
+
+        // Qué pasa cuando haces clic
+        themeToggleBtn.addEventListener('click', () => {
+            // 1. Cambia el color
+            document.body.classList.toggle('light-theme');
+
+            // 2. Guarda tu elección en la memoria para las demás pestañas
+            const isLightNow = document.body.classList.contains('light-theme');
+            localStorage.setItem('dunkel-theme', isLightNow ? 'light' : 'dark');
+
+            // 3. Cambia el icono
+            updateIcon();
+        });
+    });
 </script>
 
 </body>

@@ -13,7 +13,7 @@
             margin: 40px auto;
             width: 100%;
         }
-        
+
         /* Cabecera de pestañas con estilo Dunkel */
         .tabs-header {
             display: flex;
@@ -82,185 +82,216 @@
         }
     </style>
 </head>
-<body class="dark-theme">
+<body>
 
-    <header class="dunkel-navbar">
-        <div class="navbar-content">
-            <div class="nav-left">
-                <div class="brand-container" onclick="window.location.href='/home'">
-                    <span class="brand-logo">🕸️</span>
-                    <h1 class="brand-name">Dunkelweiss</h1>
-                </div>
-            </div>
-            <div class="nav-right">
-                <a th:href="@{/home}" class="btn btn-outline" style="text-decoration: none;">Volver al inicio</a>
+<script>
+    if (localStorage.getItem('dunkel-theme') === 'light') {
+        document.body.classList.add('light-theme');
+    }
+</script>
+
+<header class="dunkel-navbar">
+    <div class="navbar-content">
+        <div class="nav-left">
+            <div class="brand-container" onclick="window.location.href='/home'">
+                <span class="brand-logo">🕸️</span>
+                <h1 class="brand-name">Dunkelweiss</h1>
             </div>
         </div>
-    </header>
+        <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
+            <a th:href="@{/home}" class="btn btn-outline" style="text-decoration: none;">Volver al inicio</a>
+        </div>
+    </div>
+</header>
 
-    <div class="web-layout">
-        <main class="center-feed" id="profile-root" th:attr="data-active-tab=${activeTab}">
-            <div class="profile-container">
-                
-                <div class="tabs-header">
-                    <button id="tab-data" class="tab-btn" onclick="showTab('data')">Mis Datos</button>
-                    <button id="tab-communities" class="tab-btn" onclick="showTab('communities')">Mis Comunidades</button>
-                    <button id="tab-threads" class="tab-btn" onclick="showTab('threads')">Mis Hilos</button>
+<div class="web-layout">
+    <main class="center-feed" id="profile-root" th:attr="data-active-tab=${activeTab}">
+        <div class="profile-container">
+
+            <div class="tabs-header">
+                <button id="tab-data" class="tab-btn" onclick="showTab('data')">Mis Datos</button>
+                <button id="tab-communities" class="tab-btn" onclick="showTab('communities')">Mis Comunidades</button>
+                <button id="tab-threads" class="tab-btn" onclick="showTab('threads')">Mis Hilos</button>
+            </div>
+
+            <section id="section-data" class="form-card" style="display:none;">
+                <h2 class="widget-header-text" style="margin-bottom: 24px;">Configuración de Cuenta</h2>
+
+                <div class="grid-form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="text" th:value="${user.email}" class="create-input readonly" readonly />
                 </div>
 
-                <section id="section-data" class="form-card" style="display:none;">
-                    <h2 class="widget-header-text" style="margin-bottom: 24px;">Configuración de Cuenta</h2>
-                    
+                <form th:action="@{/profile/update}" method="post">
+                    <input type="hidden" name="activeTab" value="data" />
+
                     <div class="grid-form-group">
-                        <label>Correo Electrónico</label>
-                        <input type="text" th:value="${user.email}" class="create-input readonly" readonly />
+                        <label for="nickname">Nickname</label>
+                        <input type="text" id="nickname" name="nickname" th:value="${user.username}" class="create-input" required />
                     </div>
 
-                    <form th:action="@{/profile/update}" method="post">
-                        <input type="hidden" name="activeTab" value="data" />
-                        
-                        <div class="grid-form-group">
-                            <label for="nickname">Nickname</label>
-                            <input type="text" id="nickname" name="nickname" th:value="${user.username}" class="create-input" required />
-                        </div>
+                    <div class="grid-form-group">
+                        <label for="password">Nueva Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar" class="create-input" />
+                    </div>
 
-                        <div class="grid-form-group">
-                            <label for="password">Nueva Contraseña</label>
-                            <input type="password" id="password" name="password" placeholder="Dejar en blanco para no cambiar" class="create-input" />
-                        </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <span class="thread-id">UID: <span th:text="${user.id}">0</span></span>
+                        <button type="submit" class="btn" style="background-color: var(--brand-color); color: white; padding: 10px 30px;">Guardar Cambios</button>
+                    </div>
+                </form>
+            </section>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                            <span class="thread-id">UID: <span th:text="${user.id}">0</span></span>
-                            <button type="submit" class="btn" style="background-color: var(--brand-color); color: white; padding: 10px 30px;">Guardar Cambios</button>
-                        </div>
-                    </form>
-                </section>
+            <section id="section-communities" style="display:none;">
+                <div class="form-card">
+                    <h2 class="widget-header-text">Comunidades que sigues</h2>
 
-                <section id="section-communities" style="display:none;">
-                    <div class="form-card">
-                        <h2 class="widget-header-text">Comunidades que sigues</h2>
-                        
-                        <ul class="community-list" style="margin-top: 20px;">
-                            <li th:each="c : ${communities}" 
-                                class="community-item" 
-                                style="border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; transition: 0.2s;"
-                                th:onclick="|selectCommunity(this, ${c.id})|">
-                                
-                                <div style="padding: 16px; display: flex; align-items: center; gap: 15px;">
-                                    <div class="comm-avatar" 
-                                         th:with="colors=${ {'#ff9f43', '#00b894', '#0984e3', '#e84393', '#6c5ce7', '#d63031', '#fdcb6e'} }, colorIndex=${c.id % 7}"
-                                         th:style="'background-color: ' + ${colors[colorIndex]} + '; color: white; min-width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;'"
-                                         th:text="${#strings.toUpperCase(#strings.length(c.name) > 1 ? #strings.substring(c.name, 0, 2) : c.name)}">
-                                    </div>
-                                    <div class="comm-info">
-                                        <strong style="color: var(--text-primary); font-size: 16px;">d/<span th:text="${c.name}">Nombre</span></strong>
-                                        <p class="desc-text" th:text="${c.description}" style="display:none; font-size: 13px; color: var(--text-secondary); margin-top: 6px;"></p>
-                                    </div>
+                    <ul class="community-list" style="margin-top: 20px;">
+                        <li th:each="c : ${communities}"
+                            class="community-item"
+                            style="border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 12px; transition: 0.2s;"
+                            th:onclick="|selectCommunity(this, '${c.id}')|">
+
+                            <div style="padding: 16px; display: flex; align-items: center; gap: 15px;">
+                                <div class="comm-avatar"
+                                     style="background-color: #6a5acd; color: white; min-width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;"
+                                     th:text="${c.name.length() >= 2 ? c.name.substring(0,2).toUpperCase() : c.name.toUpperCase()}">
                                 </div>
-                            </li>
-                        </ul>
+                                <div class="comm-info">
+                                    <strong style="color: var(--text-primary); font-size: 16px;">d/<span th:text="${c.name}">Nombre</span></strong>
+                                    <p class="desc-text" th:text="${c.description}" style="display:none; font-size: 13px; color: var(--text-secondary); margin-top: 6px;"></p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
 
-                        <form id="leaveForm" th:action="@{/profile/leaveCommunity}" method="post" style="margin-top: 20px; text-align: center;">
-                            <input type="hidden" name="activeTab" value="communities" />
-                            <input type="hidden" name="communityId" id="selectedCommunityId" />
-                            <button id="leaveBtn" type="submit" class="btn btn-outline" disabled style="border-color: #ff5252; color: #ff5252;">Dejar de seguir</button>
+                    <form id="leaveForm" th:action="@{/profile/leaveCommunity}" method="post" style="margin-top: 20px; text-align: center;">
+                        <input type="hidden" name="activeTab" value="communities" />
+                        <input type="hidden" name="communityId" id="selectedCommunityId" />
+                        <button id="leaveBtn" type="submit" class="btn btn-outline" disabled style="border-color: #ff5252; color: #ff5252;">Dejar de seguir</button>
+                    </form>
+                </div>
+            </section>
+
+            <section id="section-threads" style="display:none;">
+                <div class="threads-grid">
+                    <div class="threads-column">
+                        <h2 class="widget-header-text">Favoritos</h2>
+                        <div th:each="t : ${favoriteThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, '${t.id}', 'fav')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                            <div style="padding: 12px;">
+                                <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
+                                <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
+                            </div>
+                        </div>
+                        <form th:action="@{/profile/unfavorite}" method="post">
+                            <input type="hidden" name="activeTab" value="threads" />
+                            <input type="hidden" name="threadId" id="selectedFavThreadId" />
+                            <button id="unfavBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Quitar Favorito</button>
                         </form>
                     </div>
-                </section>
 
-                <section id="section-threads" style="display:none;">
-                    <div class="threads-grid">
-                        <div class="threads-column">
-                            <h2 class="widget-header-text">Favoritos</h2>
-                            <div th:each="t : ${favoriteThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, ${t.id}, 'fav')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
-                                <div style="padding: 12px;">
-                                    <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
-                                    <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
-                                </div>
+                    <div class="threads-column">
+                        <h2 class="widget-header-text">Tus Hilos</h2>
+                        <div th:each="t : ${createdThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, '${t.id}', 'own')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
+                            <div style="padding: 12px;">
+                                <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
+                                <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
                             </div>
-                            <form th:action="@{/profile/unfavorite}" method="post">
-                                <input type="hidden" name="activeTab" value="threads" />
-                                <input type="hidden" name="threadId" id="selectedFavThreadId" />
-                                <button id="unfavBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Quitar Favorito</button>
-                            </form>
                         </div>
-
-                        <div class="threads-column">
-                            <h2 class="widget-header-text">Tus Hilos</h2>
-                            <div th:each="t : ${createdThreads}" class="dunkel-thread-box" th:onclick="|selectThread(this, ${t.id}, 'own')|" style="cursor: pointer; margin-bottom: 12px; border: 1px solid var(--border-color);">
-                                <div style="padding: 12px;">
-                                    <h4 th:text="${t.title}" style="font-size: 14px; color: var(--text-primary);"></h4>
-                                    <div class="thread-meta" style="font-size: 12px; margin-top: 4px;">d/<span th:text="${t.communityId}"></span></div>
-                                </div>
-                            </div>
-                            <form th:action="@{/profile/favorite}" method="post">
-                                <input type="hidden" name="activeTab" value="threads" />
-                                <input type="hidden" name="threadId" id="selectedOwnThreadId" />
-                                <button id="favBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Hacer Favorito</button>
-                            </form>
-                        </div>
+                        <form th:action="@{/profile/favorite}" method="post">
+                            <input type="hidden" name="activeTab" value="threads" />
+                            <input type="hidden" name="threadId" id="selectedOwnThreadId" />
+                            <button id="favBtn" type="submit" class="btn btn-outline" disabled style="width: 100%;">Hacer Favorito</button>
+                        </form>
                     </div>
-                </section>
+                </div>
+            </section>
 
-            </div>
-        </main>
-    </div>
+        </div>
+    </main>
+</div>
 
-    <script>
-        function showTab(name) {
-            const sections = ['data', 'communities', 'threads'];
-            sections.forEach(s => {
-                const el = document.getElementById('section-' + s);
-                const btn = document.getElementById('tab-' + s);
-                if (s === name) {
-                    el.style.display = 'block';
-                    btn.classList.add('active');
-                } else {
-                    el.style.display = 'none';
-                    btn.classList.remove('active');
-                }
-            });
-        }
-
-        function selectCommunity(element, id) {
-            const alreadySelected = element.classList.contains('selected-item');
-            
-            document.querySelectorAll('.community-item').forEach(el => {
-                el.classList.remove('selected-item');
-                el.querySelector('.desc-text').style.display = 'none';
-            });
-
-            const input = document.getElementById('selectedCommunityId');
-            const btn = document.getElementById('leaveBtn');
-
-            if (!alreadySelected) {
-                element.classList.add('selected-item');
-                element.querySelector('.desc-text').style.display = 'block';
-                input.value = id;
-                btn.disabled = false;
+<script>
+    function showTab(name) {
+        const sections = ['data', 'communities', 'threads'];
+        sections.forEach(s => {
+            const el = document.getElementById('section-' + s);
+            const btn = document.getElementById('tab-' + s);
+            if (s === name) {
+                el.style.display = 'block';
+                btn.classList.add('active');
             } else {
-                input.value = '';
-                btn.disabled = true;
+                el.style.display = 'none';
+                btn.classList.remove('active');
             }
-        }
-
-        function selectThread(element, id, type) {
-            const container = element.parentElement;
-            container.querySelectorAll('.dunkel-thread-box').forEach(el => el.classList.remove('selected-item'));
-            
-            const inputId = type === 'fav' ? 'selectedFavThreadId' : 'selectedOwnThreadId';
-            const btnId = type === 'fav' ? 'unfavBtn' : 'favBtn';
-            
-            element.classList.add('selected-item');
-            document.getElementById(inputId).value = id;
-            document.getElementById(btnId).disabled = false;
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const root = document.getElementById('profile-root');
-            const active = root.getAttribute('data-active-tab') || 'data';
-            showTab(active);
         });
-    </script>
+    }
+
+    function selectCommunity(element, id) {
+        const alreadySelected = element.classList.contains('selected-item');
+
+        document.querySelectorAll('.community-item').forEach(el => {
+            el.classList.remove('selected-item');
+            el.querySelector('.desc-text').style.display = 'none';
+        });
+
+        const input = document.getElementById('selectedCommunityId');
+        const btn = document.getElementById('leaveBtn');
+
+        if (!alreadySelected) {
+            element.classList.add('selected-item');
+            element.querySelector('.desc-text').style.display = 'block';
+            input.value = id;
+            btn.disabled = false;
+        } else {
+            input.value = '';
+            btn.disabled = true;
+        }
+    }
+
+    function selectThread(element, id, type) {
+        const container = element.parentElement;
+        container.querySelectorAll('.dunkel-thread-box').forEach(el => el.classList.remove('selected-item'));
+
+        const inputId = type === 'fav' ? 'selectedFavThreadId' : 'selectedOwnThreadId';
+        const btnId = type === 'fav' ? 'unfavBtn' : 'favBtn';
+
+        element.classList.add('selected-item');
+        document.getElementById(inputId).value = id;
+        document.getElementById(btnId).disabled = false;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const root = document.getElementById('profile-root');
+        const active = root.getAttribute('data-active-tab') || 'data';
+        showTab(active);
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const updateIcon = () => {
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+        };
+
+        updateIcon();
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+
+            const isLightNow = document.body.classList.contains('light-theme');
+            localStorage.setItem('dunkel-theme', isLightNow ? 'light' : 'dark');
+
+            updateIcon();
+        });
+    });
+</script>
 </body>
 </html>

@@ -10,20 +10,28 @@
     --bg-reply-indent: rgba(255, 69, 0, 0.06);
     --like-color: #00e676;
     --dislike-color: #ff5252;
+
+    /* Sombras y formas unificadas para congruencia */
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.25);
+    --radius-card: 10px; /* Todas las cajas usarán esto */
+    --radius-btn: 20px;
 }
 
-/* --- VARIABLES MODO CLARO --- */
+/* --- VARIABLES MODO CLARO (Premium) --- */
 body.light-theme {
-    --bg-body: #dae0e6;
+    --bg-body: #f0f2f5; /* Un gris un pelín más neutro y elegante */
     --bg-surface: #ffffff;
-    --bg-surface-hover: #f0f2f5;
-    --border-color: #cccccc;
-    --text-primary: #1c1c1c;
-    --text-secondary: #555555;
+    --bg-surface-hover: #f7f9fa;
+    --border-color: rgba(0, 0, 0, 0.08); /* Bordes sutiles en vez de grises duros */
+    --text-primary: #0f1419; /* Un "casi negro" para no cansar la vista */
+    --text-secondary: #536471;
     --brand-color: #ff4500;
-    --bg-reply-indent: rgba(255, 69, 0, 0.04);
-    --like-color: #2e7d32;
-    --dislike-color: #c62828;
+    --bg-reply-indent: rgba(255, 69, 0, 0.03);
+    --like-color: #00ba7c;
+    --dislike-color: #f4212e;
+
+    /* Sombra mucho más suave, amplia y difuminada para que "flote" */
+    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -50,7 +58,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 
 /* Ajuste: Buscador en el centro */
 .nav-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 0 24px; }
-.search-bar { width: 100%; max-width: 500px; height: 40px; background-color: var(--bg-surface-hover); border: 1px solid var(--border-color); border-radius: 20px; display: flex; align-items: center; padding: 0 16px; gap: 10px; transition: 0.2s; }
+.search-bar { width: 100%; max-width: 500px; height: 40px; background-color: var(--bg-surface-hover); border: 1px solid var(--border-color); border-radius: var(--radius-btn); display: flex; align-items: center; padding: 0 16px; gap: 10px; transition: 0.2s; }
 .search-bar:focus-within { border-color: var(--brand-color); background-color: var(--bg-surface); box-shadow: 0 0 0 1px var(--brand-color); }
 .search-icon { color: var(--text-secondary); font-size: 16px; }
 .search-input { flex: 1; background: transparent; border: none; color: var(--text-primary); font-size: 15px; outline: none; }
@@ -60,7 +68,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 
 .icon-btn-ghost { background: transparent; color: var(--text-primary); border: none; font-size: 20px; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.2s;}
 .icon-btn-ghost:hover { background-color: var(--bg-surface-hover); }
-.btn { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
+.btn { padding: 8px 16px; border-radius: var(--radius-btn); font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
 .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--text-primary); }
 .btn-outline:hover { background-color: var(--bg-surface-hover); }
 .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--brand-color); color: white; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -105,7 +113,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 .center-feed::-webkit-scrollbar-track { background: transparent; }
 
 /* Carrusel y Reels */
-.carousel-container { position: relative; width: 100%; min-height: 180px; border-radius: 8px; overflow: hidden; background-color: var(--bg-surface); flex-shrink: 0; }
+.carousel-container { position: relative; width: 100%; min-height: 180px; border-radius: var(--radius-card); overflow: hidden; background-color: var(--bg-surface); flex-shrink: 0; box-shadow: var(--shadow-card); transition: background-color 0.3s, box-shadow 0.3s; }
 .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
 .carousel-slide.active { opacity: 1; z-index: 1; }
 .carousel-caption { width: 100%; padding: 16px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); color: white; font-weight: bold; font-size: 16px; }
@@ -113,13 +121,13 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 .reels-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth; flex-shrink: 0; }
 .reels-container::-webkit-scrollbar { height: 6px; }
 .reels-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-.reel-card { min-width: 160px; height: 220px; background-color: #2a3b42; border-radius: 12px; display: flex; align-items: flex-end; padding: 16px 12px; cursor: pointer; transition: 0.2s; }
+.reel-card { min-width: 160px; height: 220px; background-color: #2a3b42; border-radius: var(--radius-card); display: flex; align-items: flex-end; padding: 16px 12px; cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-card); }
 .reel-card:hover { transform: scale(1.03); }
 .reel-title { font-size: 14px; font-weight: bold; color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); line-height: 1.3; }
 
 /* Crear Hilo */
-.create-thread-container { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-.user-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: #4f4f4f; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;}
+.create-thread-container { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-card); padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; box-shadow: var(--shadow-card); transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; background-color: var(--border-color); display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--text-primary);}
 .create-input { flex: 1; height: 40px; background-color: var(--bg-surface-hover); border: 1px solid var(--border-color); border-radius: 6px; padding: 0 16px; font-size: 15px; color: var(--text-primary); outline: none; }
 .icon-btn { background: transparent; border: none; cursor: pointer; font-size: 22px; padding: 8px; border-radius: 4px; color: var(--text-primary); }
 
@@ -127,10 +135,11 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 .thread-card {
     background-color: var(--bg-surface);
     border: 1px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: var(--radius-card);
     overflow: hidden;
-    transition: background-color 0.3s, border-color 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     flex-shrink: 0;
+    box-shadow: var(--shadow-card);
 }
 .thread-card:hover { border-color: var(--text-secondary); }
 
@@ -166,7 +175,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 .right-panel { width: 280px; height: 100%; display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; padding-bottom: 24px;}
 .right-panel::-webkit-scrollbar { display: none; }
 
-.dunkel-widget { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; margin-bottom: 16px;}
+.dunkel-widget { background-color: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-card); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s; }
 .widget-header-text { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; margin-bottom: 16px; }
 .community-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
 .community-list li { display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s; padding: 4px; border-radius: 6px;}
@@ -189,13 +198,15 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 /* --- FRAGMENTS -- */
 /* --- Estilos para la Tarjeta del Hilo --- */
 .dunkel-thread-box {
-    background-color: transparent;
-    border: 1px solid #30363d;
-    border-radius: 6px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
     margin-bottom: 16px;
     display: flex;
     flex-direction: column;
-    color: #c9d1d9;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
@@ -205,10 +216,10 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
     justify-content: space-between;
     align-items: flex-start;
     padding: 12px 16px;
-    border-bottom: 1px solid #30363d;
-    background-color: #161b22;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-surface-hover);
+    border-top-left-radius: var(--radius-card);
+    border-top-right-radius: var(--radius-card);
 }
 
 .thread-header-main {
@@ -221,16 +232,16 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
     margin: 0;
     font-size: 16px;
     font-weight: 600;
-    color: #f0f6fc;
+    color: var(--text-primary);
 }
 
 .thread-meta {
     font-size: 13px;
-    color: #8b949e;
+    color: var(--text-secondary);
 }
 
 .thread-author {
-    color: #c9d1d9;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -242,18 +253,18 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 }
 
 .badge-owner {
-    border: 1px solid #30363d;
+    border: 1px solid var(--border-color);
     border-radius: 2em;
     padding: 2px 8px;
     font-size: 12px;
     font-weight: 500;
-    color: #8b949e;
+    color: var(--text-secondary);
 }
 
 .btn-more {
     background: none;
     border: none;
-    color: #8b949e;
+    color: var(--text-secondary);
     cursor: pointer;
     font-size: 16px;
     padding: 0;
@@ -261,7 +272,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 }
 
 .btn-more:hover {
-    color: #c9d1d9;
+    color: var(--text-primary);
 }
 
 /* Cuerpo del Post */
@@ -269,7 +280,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
     padding: 16px;
     font-size: 14px;
     line-height: 1.5;
-    color: #c9d1d9;
+    color: var(--text-primary);
 }
 
 .thread-body p {
@@ -284,21 +295,22 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 
 .btn-reaction {
     background: transparent;
-    border: 1px solid #30363d;
+    border: 1px solid var(--border-color);
     border-radius: 1.5em;
     padding: 4px 8px;
     cursor: pointer;
     font-size: 14px;
-    color: #8b949e;
-    transition: background-color 0.2s, border-color 0.2s;
+    color: var(--text-secondary);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .btn-reaction:hover {
-    background-color: #30363d;
-    border-color: #8b949e;
+    background-color: var(--bg-surface-hover);
+    border-color: var(--text-primary);
+    color: var(--text-primary);
 }
 
 /* ============================================
@@ -319,7 +331,7 @@ body { background-color: var(--bg-body); color: var(--text-primary); overflow: h
 
 .thread-detail-header {
     background-color: var(--bg-surface); border: 1px solid var(--border-color);
-    border-radius: 10px; padding: 24px; margin-bottom: 20px;
+    border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow-card); transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 .thread-detail-breadcrumb {
     display: flex; align-items: center; gap: 8px;
@@ -345,7 +357,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 
 .new-post-form {
     background-color: var(--bg-surface); border: 1px solid var(--border-color);
-    border-radius: 10px; padding: 20px; margin-bottom: 20px;
+    border-radius: var(--radius-card); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-card); transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 .new-post-form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 12px; }
 .new-post-input {
@@ -364,7 +376,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 .new-post-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
 .btn-submit {
     background-color: var(--brand-color); color: white; border: none;
-    padding: 10px 24px; border-radius: 20px; font-size: 14px; font-weight: 600;
+    padding: 10px 24px; border-radius: var(--radius-btn); font-size: 14px; font-weight: 600;
     cursor: pointer; transition: 0.2s;
 }
 .btn-submit:hover { opacity: 0.85; transform: translateY(-1px); }
@@ -377,7 +389,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 
 .post-card {
     background-color: var(--bg-surface); border: 1px solid var(--border-color);
-    border-radius: 8px; margin-bottom: 12px; transition: border-color 0.2s;
+    border-radius: var(--radius-card); margin-bottom: 12px; transition: border-color 0.2s, background-color 0.3s, box-shadow 0.3s; box-shadow: var(--shadow-card);
 }
 .post-card:hover { border-color: var(--text-secondary); }
 .post-card-header {
@@ -399,7 +411,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 .post-card-footer { display: flex; align-items: center; gap: 4px; padding: 8px 16px 12px; }
 
 .post-vote-btn {
-    background: transparent; border: 1px solid var(--border-color); border-radius: 20px;
+    background: transparent; border: 1px solid var(--border-color); border-radius: var(--radius-btn);
     padding: 4px 10px; cursor: pointer; font-size: 14px; color: var(--text-secondary);
     transition: 0.2s; display: flex; align-items: center; gap: 4px;
 }
@@ -418,7 +430,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 .replies-container { margin-left: 24px; padding-left: 16px; border-left: 2px solid var(--border-color); }
 .reply-card {
     background-color: var(--bg-reply-indent); border: 1px solid var(--border-color);
-    border-radius: 8px; margin-bottom: 10px; margin-top: 10px;
+    border-radius: var(--radius-card); margin-bottom: 10px; margin-top: 10px; box-shadow: none; /* Las respuestas no llevan sombra para no saturar */
 }
 .reply-card .post-card-header { padding: 10px 14px; }
 .reply-card .post-card-body { padding: 12px 14px; }
@@ -457,7 +469,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 .thread-sidebar::-webkit-scrollbar { display: none; }
 .sidebar-widget {
     background-color: var(--bg-surface); border: 1px solid var(--border-color);
-    border-radius: 8px; padding: 16px; margin-bottom: 16px;
+    border-radius: var(--radius-card); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-card); transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 .sidebar-widget-title { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; font-weight: bold; margin-bottom: 14px; }
 .thread-info-row {
@@ -479,7 +491,7 @@ body.light-theme .thread-detail-desc { background-color: rgba(0,0,0,0.03); }
 .btn-join-community {
     width: 100%; margin-top: 12px; background: transparent;
     border: 1px solid var(--brand-color); color: var(--brand-color);
-    padding: 8px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    padding: 8px; border-radius: var(--radius-btn); font-size: 13px; font-weight: 600;
     cursor: pointer; transition: 0.2s;
 }
 .btn-join-community:hover { background-color: var(--brand-color); color: white; }

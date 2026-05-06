@@ -71,6 +71,12 @@
 </head>
 <body>
 
+<script>
+    if (localStorage.getItem('dunkel-theme') === 'light') {
+        document.body.classList.add('light-theme');
+    }
+</script>
+
 <header class="dunkel-navbar">
     <div class="navbar-content">
         <div class="nav-left">
@@ -82,6 +88,9 @@
             </div>
         </div>
         <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
             <a href="/home" class="btn btn-outline" style="text-decoration: none; display: flex; align-items: center;">Volver</a>
         </div>
     </div>
@@ -122,6 +131,29 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const updateIcon = () => {
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+        };
+
+        updateIcon();
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+
+            const isLightNow = document.body.classList.contains('light-theme');
+            localStorage.setItem('dunkel-theme', isLightNow ? 'light' : 'dark');
+
+            updateIcon();
+        });
+    });
+</script>
 
 </body>
 </html>

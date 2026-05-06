@@ -12,25 +12,31 @@
         .post-collapse-area { display: inline-flex; align-items: center; gap: 0.4rem; margin-right: 0.6rem; }
         .reply-count-badge { background: #f1f1f1; border-radius: 999px; padding: 2px 6px; font-size: 0.85rem; color: #333; }
         .reply-count-badge.hidden { display: none !important; }
-		.post-action-btn.collapse-toggle { 
-		    padding: 2px 8px; 
-		    cursor: pointer; 
-		    background: transparent; 
-		    border: none; 
-		    color: var(--text-primary); 
-		    font-size: 1.2rem;          
-		    font-weight: bold; 
-		    transition: transform 0.2s, color 0.2s;
-		    display: flex;
-		    align-items: center;
-		}
-		.post-action-btn.collapse-toggle:hover {
-		    color: var(--brand-color);  
-		    transform: scale(1.2);      
-		}
+        .post-action-btn.collapse-toggle {
+            padding: 2px 8px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .post-action-btn.collapse-toggle:hover {
+            color: var(--brand-color);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 <body>
+
+<script>
+    if (localStorage.getItem('dunkel-theme') === 'light') {
+        document.body.classList.add('light-theme');
+    }
+</script>
 
 <header class="dunkel-navbar">
     <div class="navbar-content">
@@ -51,26 +57,28 @@
             </form>
         </div>
 
-		<div class="nav-right">
-		    <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">🌓</button>
-		    <a th:if="${@authServiceProxy.getToken() == null}" 
-		       th:href="@{/auth}" 
-		       class="btn btn-outline" 
-		       style="text-decoration: none; display: flex; align-items: center;">
-		        Log in
-		    </a>
-		    <a th:if="${@authServiceProxy.getToken() != null}" 
-		       th:href="@{/logout}" 
-		       class="btn btn-outline"
-		       style="text-decoration: none;">
-		        Logout
-		    </a>
-		    <a th:href="@{${@authServiceProxy.getToken() != null ? '/profile' : '/auth'}}" 
-		       class="nav-avatar" 
-		       style="text-decoration: none;">
-		        D
-		    </a>
-		</div>
+        <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
+            <a th:if="${@authServiceProxy.getToken() == null}"
+               th:href="@{/auth}"
+               class="btn btn-outline"
+               style="text-decoration: none; display: flex; align-items: center;">
+                Log in
+            </a>
+            <a th:if="${@authServiceProxy.getToken() != null}"
+               th:href="@{/logout}"
+               class="btn btn-outline"
+               style="text-decoration: none;">
+                Logout
+            </a>
+            <a th:href="@{${@authServiceProxy.getToken() != null ? '/profile' : '/auth'}}"
+               class="nav-avatar"
+               style="text-decoration: none;">
+                D
+            </a>
+        </div>
     </div>
 </header>
 
@@ -86,7 +94,7 @@
     </aside>
 
     <main class="thread-main-column">
-        
+
         <div class="thread-detail-header">
             <div class="thread-detail-breadcrumb">
                 <a th:href="@{/home}">Inicio</a> <span>›</span>
@@ -132,7 +140,7 @@
     <div class="post-card">
         <div class="post-card-header">
             <div class="post-card-author">
-                <div class="post-avatar" 
+                <div class="post-avatar"
                      th:style="'background-color: #6a5acd;'"
                      th:text="${post.ownerUsername != null ? post.ownerUsername.substring(0,1) : 'U'}">U</div>
                 <div class="post-author-info">
@@ -145,12 +153,12 @@
             <div class="post-card-content" th:utext="${post.content}">Contenido</div>
         </div>
 
-		<div class="post-card-footer">
+        <div class="post-card-footer">
             <div class="post-collapse-area">
                 <button class="post-action-btn collapse-toggle" type="button"
                         th:if="${post.replies != null and #lists.size(post.replies) > 0}"
                         th:attr="data-target='replies-' + ${post.id}">▸</button>
-                
+
                 <span class="reply-count-badge" th:if="${post.replies != null and #lists.size(post.replies) > 0}" th:text="${#lists.size(post.replies)}">0</span>
             </div>
             <button class="post-action-btn reply-toggle" type="button" th:attr="data-target='reply-form-' + ${post.id}">💬 Responder</button>
@@ -179,9 +187,6 @@
 </div>
 
 <script>
-    // Tema claro/oscuro
-    document.getElementById('theme-toggle').onclick = () => document.body.classList.toggle('light-theme');
-
     // Mostrar/ocultar formulario de respuesta
     document.querySelectorAll('.reply-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -207,6 +212,29 @@
                 const badge = btn.nextElementSibling;
                 if (badge) badge.classList.toggle('hidden', !isCollapsed);
             }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const updateIcon = () => {
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+        };
+
+        updateIcon();
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+
+            const isLightNow = document.body.classList.contains('light-theme');
+            localStorage.setItem('dunkel-theme', isLightNow ? 'light' : 'dark');
+
+            updateIcon();
         });
     });
 </script>

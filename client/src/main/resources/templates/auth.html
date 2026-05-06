@@ -125,7 +125,13 @@
         }
     </style>
 </head>
-<body class="dark-theme">
+<body>
+
+<script>
+    if (localStorage.getItem('dunkel-theme') === 'light') {
+        document.body.classList.add('light-theme');
+    }
+</script>
 
 <div id="rickroll-container">
     <iframe id="rickroll-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
@@ -145,6 +151,10 @@
         </div>
 
         <div class="nav-right">
+            <button id="theme-toggle" class="icon-btn-ghost" title="Cambiar tema">
+                <span id="theme-icon">🌙</span>
+            </button>
+
             <button class="btn btn-outline" id="toggle-btn" onclick="toggleMode()">
                 Sign Up
             </button>
@@ -213,6 +223,7 @@
 </div>
 
 <script>
+    // --- LÓGICA DE LOGIN Y RICKROLL ---
     const urlParams = new URLSearchParams(window.location.search);
     const initialMode = urlParams.get('mode') || 'signin';
     if (initialMode === 'signup') {
@@ -240,15 +251,34 @@
         document.getElementById('toggle-btn').textContent = 'Iniciar sesión';
     }
 
-    /* ── NUEVO: Función para ejecutar la trampa ── */
     function activarRickroll() {
-        // Muestra el div que ocupa toda la pantalla
         document.getElementById('rickroll-container').style.display = 'block';
-
-        // Inyecta la URL con el autoplay en el iframe en el momento exacto del clic
-        // Esto asegura que el navegador valide la acción y no bloquee el sonido
         document.getElementById('rickroll-frame').src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
     }
 </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        const updateIcon = () => {
+            const isLight = document.body.classList.contains('light-theme');
+            themeIcon.textContent = isLight ? '☀️' : '🌙';
+        };
+
+        updateIcon();
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+
+            const isLightNow = document.body.classList.contains('light-theme');
+            localStorage.setItem('dunkel-theme', isLightNow ? 'light' : 'dark');
+
+            updateIcon();
+        });
+    });
+</script>
+
 </body>
 </html>
