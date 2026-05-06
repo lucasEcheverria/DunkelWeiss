@@ -101,6 +101,20 @@ public class ThreadServiceProxy {
         }
     }
 
+    public List<ThreadSummaryDTO> getConversationThreads(String email) {
+        try {
+            ResponseEntity<List<ThreadSummaryDTO>> response = restTemplate.exchange(
+                    serverApiUrl + "/api/threads/user/conversations?email=" + email,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
+            return response.getBody() != null ? response.getBody() : Collections.emptyList();
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
+    }
+
     public List<ThreadSummaryDTO> getInitialFeed() {
         try {
             ResponseEntity<List<ThreadSummaryDTO>> response = restTemplate.exchange(

@@ -106,6 +106,7 @@
                     <button id="tab-data" class="tab-btn" onclick="showTab('data')">Mis Datos</button>
                     <button id="tab-communities" class="tab-btn" onclick="showTab('communities')">Mis Comunidades</button>
                     <button id="tab-threads" class="tab-btn" onclick="showTab('threads')">Mis Hilos</button>
+                    <button id="tab-conversations" class="tab-btn" onclick="showTab('conversations')">Conversaciones</button>
                 </div>
 
                 <section id="section-data" class="form-card" style="display:none;">
@@ -202,13 +203,19 @@
                     </div>
                 </section>
 
+                <section id="section-conversations" style="display:none;">
+                    <div th:each="thread : ${conversationThreads}">
+                        <div th:replace="~{fragments/thread_box :: box(${thread})}"></div>
+                    </div>
+                </section>
+
             </div>
         </main>
     </div>
 
     <script>
         function showTab(name) {
-            const sections = ['data', 'communities', 'threads'];
+            const sections = ['data', 'communities', 'threads', 'conversations'];
             sections.forEach(s => {
                 const el = document.getElementById('section-' + s);
                 const btn = document.getElementById('tab-' + s);

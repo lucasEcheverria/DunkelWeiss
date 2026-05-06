@@ -37,6 +37,6 @@ out/
 .vscode/
 
 ### claude code ###
-.claude/settings.local.json
+.claude/
 CLAUDE.local.md
 /*.log

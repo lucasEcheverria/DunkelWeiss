@@ -156,6 +156,36 @@ public class ThreadController {
     }
 
     @Operation(
+            summary = "Hilos donde el usuario ha participado",
+            description = "Devuelve los hilos distintos en los que el usuario ha publicado al menos un post."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de hilos (puede estar vacía)",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ThreadDTO.class)
+                    )
+            )
+    })
+    @GetMapping("/user/conversations")
+    public ResponseEntity<List<ThreadSummaryDTO>> getThreadsWhereUserPosted(
+            @Parameter(description = "Email del usuario que ha posteado", example = "test@test.com", required = true)
+            @RequestParam(value = "email") String email) {
+        List<Thread> threads = threadService.getThreadsWhereUserPosted(email);
+        List<ThreadSummaryDTO> result = threads.stream()
+                .map(thread -> new ThreadSummaryDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null
+                ))
+                .toList();
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(
             summary = "Obtener un hilo por ID",
             description = "Devuelve la información completa de un hilo: título, descripción, propietario y comunidad."
     )

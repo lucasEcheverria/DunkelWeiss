@@ -64,7 +64,11 @@ public class ThreadService {
     public List<Thread> getThreadsFromUser(String email) {
         return threadRepository.findByOwnerEmail(email);
     }
-    
+
+    public List<Thread> getThreadsWhereUserPosted(String email) {
+        return threadRepository.findDistinctByPostsOwnerEmail(email);
+    }
+
     // Añade un hilo a la lista de favoritos del usuario autenticado.
     public void addFavoriteThread(User user, Integer threadId) {
         User u = userRepository.findById(user.getId())

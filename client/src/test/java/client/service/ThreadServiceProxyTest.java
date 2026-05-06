@@ -286,6 +286,62 @@ public class ThreadServiceProxyTest {
     }
 
     // ==========================================
+    // GetConversationThreads
+    // ==========================================
+
+    @Nested
+    class GetConversationThreads {
+
+        @Test
+        void getConversationThreads_ExistingEmail_ReturnsList() {
+            List<ThreadSummaryDTO> expected = List.of(
+                    new ThreadSummaryDTO(5, "Thread con post", "desc", "poster")
+            );
+
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/user/conversations?email=poster@p.com"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(expected));
+
+            List<ThreadSummaryDTO> result = threadServiceProxy.getConversationThreads("poster@p.com");
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).id()).isEqualTo(5);
+            assertThat(result.get(0).title()).isEqualTo("Thread con post");
+        }
+
+        @Test
+        void getConversationThreads_WhenBodyIsNull_ReturnsEmptyList() {
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/user/conversations?email=nobody@x.com"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenReturn(ResponseEntity.ok(null));
+
+            List<ThreadSummaryDTO> result = threadServiceProxy.getConversationThreads("nobody@x.com");
+
+            assertThat(result).isEmpty();
+        }
+
+        @Test
+        void getConversationThreads_WhenExceptionThrown_ReturnsEmptyList() {
+            when(restTemplate.exchange(
+                    eq(BASE_URL + "/api/threads/user/conversations?email=error@x.com"),
+                    eq(HttpMethod.GET),
+                    isNull(),
+                    any(ParameterizedTypeReference.class)
+            )).thenThrow(new RuntimeException("Connection refused"));
+
+            List<ThreadSummaryDTO> result = threadServiceProxy.getConversationThreads("error@x.com");
+
+            assertThat(result).isEmpty();
+        }
+    }
+
+    // ==========================================
     // GetInitialFeed
     // ==========================================
 

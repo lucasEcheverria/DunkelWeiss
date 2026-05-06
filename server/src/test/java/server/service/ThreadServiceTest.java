@@ -371,6 +371,38 @@ public class ThreadServiceTest {
     }
 
     // ==========================================
+    // GetThreadsWhereUserPosted
+    // ==========================================
+
+    @Nested
+    class GetThreadsWhereUserPosted {
+
+        @Test
+        void getThreadsWhereUserPosted_ExistingEmail_ReturnsThreads() {
+            User owner = buildUser("p@p.com", "poster");
+            Community community = buildCommunity(1, "General");
+            Thread t = buildThread(5, "Thread con post", "desc", owner, community);
+
+            when(threadRepository.findDistinctByPostsOwnerEmail("p@p.com")).thenReturn(List.of(t));
+
+            List<Thread> result = threadService.getThreadsWhereUserPosted("p@p.com");
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getTitle()).isEqualTo("Thread con post");
+            assertThat(result.get(0).getOwner().getNickname()).isEqualTo("poster");
+        }
+
+        @Test
+        void getThreadsWhereUserPosted_NoThreads_ReturnsEmptyList() {
+            when(threadRepository.findDistinctByPostsOwnerEmail("noone@x.com")).thenReturn(List.of());
+
+            List<Thread> result = threadService.getThreadsWhereUserPosted("noone@x.com");
+
+            assertThat(result).isEmpty();
+        }
+    }
+
+    // ==========================================
     // GetInitialFeed
     // ==========================================
 
