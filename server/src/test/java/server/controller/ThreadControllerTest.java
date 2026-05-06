@@ -285,6 +285,48 @@ class ThreadControllerTest {
     }
 
     // ==========================================
+    // GET /api/threads/user/conversations?email=
+    // ==========================================
+
+    @Nested
+    class GetThreadsWhereUserPosted {
+
+        @Test
+        void withValidEmail_ReturnsOkAndList() throws Exception {
+            server.entity.Thread thread = buildThread(1, "Replied Thread", "desc", user, buildCommunity("Tech"));
+
+            when(threadService.getThreadsWhereUserPosted("email@email.com")).thenReturn(List.of(thread));
+
+            mockMvc.perform(get("/api/threads/user/conversations").param("email", "email@email.com"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(1))
+                    .andExpect(jsonPath("$[0].id").value(1))
+                    .andExpect(jsonPath("$[0].title").value("Replied Thread"))
+                    .andExpect(jsonPath("$[0].owner").value("nickname"));
+        }
+
+        @Test
+        void withThreadHavingNullOwner_ReturnsNullOwnerField() throws Exception {
+            server.entity.Thread thread = buildThread(2, "Orphan Thread", "desc", null, buildCommunity("Tech"));
+
+            when(threadService.getThreadsWhereUserPosted("email@email.com")).thenReturn(List.of(thread));
+
+            mockMvc.perform(get("/api/threads/user/conversations").param("email", "email@email.com"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].owner").isEmpty());
+        }
+
+        @Test
+        void withNoConversations_ReturnsOkAndEmptyList() throws Exception {
+            when(threadService.getThreadsWhereUserPosted("empty@email.com")).thenReturn(Collections.emptyList());
+
+            mockMvc.perform(get("/api/threads/user/conversations").param("email", "empty@email.com"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(0));
+        }
+    }
+
+    // ==========================================
     // GET /api/threads/thread_feed
     // ==========================================
 
