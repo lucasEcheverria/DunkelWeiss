@@ -155,6 +155,22 @@ public class ThreadController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/user/conversations")
+    public ResponseEntity<List<ThreadSummaryDTO>> getThreadsWhereUserPosted(
+            @Parameter(description = "Email del usuario que ha posteado", example = "test@test.com", required = true)
+            @RequestParam(value = "email") String email) {
+        List<Thread> threads = threadService.getThreadsWhereUserPosted(email);
+        List<ThreadSummaryDTO> result = threads.stream()
+                .map(thread -> new ThreadSummaryDTO(
+                        thread.getId(),
+                        thread.getTitle(),
+                        thread.getDescription(),
+                        thread.getOwner()     != null ? thread.getOwner().getNickname()   : null
+                ))
+                .toList();
+        return ResponseEntity.ok(result);
+    }
+
     @Operation(
             summary = "Obtener un hilo por ID",
             description = "Devuelve la información completa de un hilo: título, descripción, propietario y comunidad."
