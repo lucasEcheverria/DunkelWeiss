@@ -155,6 +155,20 @@ public class ThreadController {
         return ResponseEntity.ok(result);
     }
 
+    @Operation(
+            summary = "Hilos donde el usuario ha participado",
+            description = "Devuelve los hilos distintos en los que el usuario ha publicado al menos un post."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de hilos (puede estar vacía)",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ThreadDTO.class)
+                    )
+            )
+    })
     @GetMapping("/user/conversations")
     public ResponseEntity<List<ThreadSummaryDTO>> getThreadsWhereUserPosted(
             @Parameter(description = "Email del usuario que ha posteado", example = "test@test.com", required = true)
