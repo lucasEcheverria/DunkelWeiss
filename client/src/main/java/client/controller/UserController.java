@@ -4,10 +4,7 @@ import client.service.AuthServiceProxy;
 import client.service.UserServiceProxy;
 import client.service.CommunityServiceProxy;
 import client.service.ThreadServiceProxy;
-import lib.dto.UpdateUserDTO;
-import lib.dto.UserDTO;
-import lib.dto.CommunityDTO;
-import lib.dto.ThreadDTO;
+import lib.dto.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,11 +48,13 @@ public class UserController {
         List<CommunityDTO> communities = communityService.getMyCommunities(token);
         List<ThreadDTO> createdThreads = threadService.getThreadsFromUser(user.getEmail());
         List<ThreadDTO> favoriteThreads = threadService.getFavoriteThreads();
+        List<ThreadSummaryDTO> conversationThreads = threadService.getConversationThreads(user.getEmail());
 
         model.addAttribute("user", user);
         model.addAttribute("communities", communities);
         model.addAttribute("createdThreads", createdThreads);
         model.addAttribute("favoriteThreads", favoriteThreads);
+        model.addAttribute("conversationThreads", conversationThreads);
         model.addAttribute("activeTab", tab);
         return "profile"; // Necesita template profile.html
     }
